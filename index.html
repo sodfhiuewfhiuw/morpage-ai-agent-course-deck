@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GPT + Codex 實戰：打造 MorPage 銷售台與專屬 AI Agent</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --fg: #111111;
+      --muted: #676767;
+      --border: #e5e5e5;
+      --accent: #2f6feb;
+      --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #dc2626;
+      --success: #16803a;
+      --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.5;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { text-wrap: balance; letter-spacing: 0; }
+    p, li { text-wrap: pretty; }
+
+    #deck { position: fixed; inset: 0; }
+    .slide {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      padding: clamp(38px, 5.4vw, 78px) clamp(46px, 6.8vw, 104px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+      transition: transform 260ms var(--ease-standard), opacity 180ms var(--ease-standard);
+    }
+    .slide.is-active { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 1; }
+    .slide.is-before { transform: translateX(-100%); }
+    .slide.dark { background: var(--fg); color: var(--bg); }
+    .slide.dark .lead, .slide.dark .muted, .slide.dark li { color: color-mix(in oklab, var(--bg), transparent 20%); }
+    .slide.dark .plain-card, .slide.dark .step-box, .slide.dark .teacher-panel { background: color-mix(in oklab, var(--bg), transparent 92%); border-color: color-mix(in oklab, var(--bg), transparent 82%); }
+    .slide.dark .plain-card h3, .slide.dark .step-box h3, .slide.dark .teacher-panel h3 { color: var(--bg); }
+    .slide.dark .safety-strip { background: color-mix(in oklab, var(--bg), transparent 90%); color: var(--bg); border-color: color-mix(in oklab, var(--bg), transparent 74%); }
+
+    .center { align-items: center; text-align: center; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .h-hero { font-size: clamp(54px, 7.8vw, 112px); line-height: 1.04; margin: 0 0 20px; font-weight: 760; max-width: 12ch; }
+    .h-xl { font-size: clamp(42px, 5.2vw, 70px); line-height: 1.12; margin: 0 0 20px; font-weight: 740; max-width: 18ch; }
+    .h-md { font-size: clamp(34px, 4vw, 52px); line-height: 1.16; margin: 0 0 20px; font-weight: 720; max-width: 20ch; }
+    .lead { font-size: clamp(21px, 2.1vw, 30px); color: var(--muted); line-height: 1.55; max-width: 58ch; }
+    .center .lead { margin-inline: auto; }
+
+    .hero-flow { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 16px; width: min(880px, 100%); margin-top: 42px; }
+    .plain-card, .step-box, .teacher-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+    }
+    .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 28px; line-height: 1.2; margin-bottom: 10px; }
+    .plain-card p, .step-box p, .teacher-panel p { color: var(--muted); margin: 0; font-size: 19px; }
+
+    .three-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 34px; }
+    .two-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; margin-top: 34px; }
+    .four-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 32px; }
+    .flow-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 34px; }
+    .flow-list .step-box { min-height: 170px; }
+    .num { font-family: var(--font-mono); color: var(--accent); font-size: 14px; margin-bottom: 14px; display: block; }
+
+    .screen-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr);
+      gap: 36px;
+      align-items: center;
+      min-height: 0;
+    }
+    .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(340px, 0.86fr); }
+    .screenshot-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      height: min(72vh, 620px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px color-mix(in oklab, var(--fg), transparent 93%);
+      margin: 0;
+    }
+    .screenshot-frame img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+    .teacher-panel { padding: 24px; }
+    .teacher-panel h2 { font-size: clamp(30px, 3.4vw, 46px); line-height: 1.15; margin-bottom: 18px; }
+    .teach-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 13px; }
+    .teach-list li {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .teach-list strong { color: var(--fg); display: block; margin-bottom: 4px; }
+    .slide.dark .teach-list strong { color: var(--bg); }
+    .teach-list .warn strong { color: var(--warn); }
+    .safety-strip {
+      margin-top: 18px;
+      border: 1px solid color-mix(in oklab, var(--warn), transparent 72%);
+      background: var(--warn-soft);
+      color: #7c2d12;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-weight: 700;
+    }
+
+    .check-list { display: grid; gap: 14px; margin-top: 28px; max-width: 1000px; }
+    .check-list li { list-style: none; border-top: 1px solid var(--border); padding-top: 13px; font-size: clamp(21px, 2.1vw, 29px); }
+    .check-list strong { color: var(--accent); margin-right: 10px; font-family: var(--font-mono); font-size: 16px; }
+    .quote { font-size: clamp(38px, 5vw, 70px); line-height: 1.16; max-width: 15ch; font-weight: 760; }
+    .template-box {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 32px;
+      align-items: start;
+      margin-top: 28px;
+    }
+    .template-code {
+      font-family: var(--font-mono);
+      white-space: pre-wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.55;
+      max-height: 64vh;
+      overflow: hidden;
+    }
+    .slide.dark .template-code { background: color-mix(in oklab, var(--bg), transparent 92%); border-color: color-mix(in oklab, var(--bg), transparent 82%); color: var(--bg); }
+    .notes { display: none; }
+
+    .deck-counter {
+      position: fixed;
+      right: 30px;
+      bottom: 24px;
+      z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg);
+    }
+    .deck-hint {
+      position: fixed;
+      left: 30px;
+      bottom: 25px;
+      z-index: 10;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .deck-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0;
+      background: var(--accent);
+      z-index: 10;
+      transition: width 200ms var(--ease-standard);
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 32px 26px 62px; }
+      .screen-layout, .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(230px, 0.86fr); gap: 16px; }
+      .template-box { grid-template-columns: 1fr; gap: 18px; }
+      .screenshot-frame { height: 58vh; }
+      .three-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .two-grid, .four-grid, .flow-list, .hero-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .plain-card, .step-box, .teacher-panel { padding: 16px; }
+      .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 22px; }
+      .plain-card p, .step-box p, .teacher-panel p, .teach-list li { font-size: 16px; }
+      .lead { font-size: 20px; }
+      .h-hero { font-size: 52px; }
+      .h-xl { font-size: 40px; }
+      .h-md { font-size: 32px; }
+    }
+    @media (max-width: 620px), (max-height: 680px) {
+      .slide { padding: 24px 26px 56px; }
+      .eyebrow { margin-bottom: 10px; font-size: 11px; }
+      .lead { font-size: 18px; line-height: 1.42; }
+      .h-hero { font-size: 44px; line-height: 1.04; }
+      .h-xl { font-size: 34px; line-height: 1.1; margin-bottom: 12px; }
+      .h-md { font-size: 28px; line-height: 1.12; margin-bottom: 12px; }
+      .three-grid, .two-grid, .four-grid, .flow-list, .hero-flow { gap: 10px; margin-top: 16px; }
+      .plain-card, .step-box, .teacher-panel { padding: 13px; }
+      .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 20px; margin-bottom: 6px; }
+      .plain-card p, .step-box p, .teacher-panel p, .teach-list li { font-size: 14px; line-height: 1.38; }
+      .check-list { gap: 8px; margin-top: 14px; }
+      .check-list li { font-size: 18px; padding-top: 8px; }
+      .template-code { font-size: 13px; line-height: 1.38; padding: 14px; max-height: 52vh; }
+      .screen-layout, .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.9fr); gap: 12px; }
+      .screenshot-frame { height: 62vh; padding: 8px; }
+      .teach-list { gap: 8px; }
+      .teach-list li { padding-top: 8px; }
+      .safety-strip { margin-top: 10px; padding: 10px 12px; font-size: 14px; }
+    }
+    @media print {
+      body { overflow: visible; }
+      .slide { position: relative; opacity: 1; pointer-events: auto; transform: none; page-break-after: always; }
+      .deck-counter, .deck-hint, .deck-progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main id="deck" aria-live="polite"></main>
+  <div class="deck-progress" id="deck-progress" aria-hidden="true"></div>
+  <div class="deck-counter" id="deck-counter">1 / 45</div>
+  <div class="deck-hint">← / → · Home · End</div>
+
+  <script>
+    const slides = [
+      { kind: "hero", theme: "light center", label: "01 封面", eyebrow: "MorPage 實作課 · HTML PPT 完整版", title: "GPT + Codex 實戰", lead: "打造 MorPage 銷售台與專屬 AI Agent，讓學員照著做、看得到成果。", cards: [["ChatGPT", "產生商品素材"], ["Codex", "讀 SOP、帶操作"], ["MorPage", "建立測試商品"], ["銷售台", "回列表驗證"]], notes: ["先說明這是實作課，不是概念課。", "提醒學員今天會跟著畫面一步步操作。", "把 ChatGPT、Codex、MorPage 的分工先放進腦中。", "轉場到今天不做什麼，避免期待落差。"] },
+      { kind: "concept", theme: "light", label: "02 今天不是 AI 初階課", eyebrow: "課程定位", title: "不是重講工具，是把 AI 放進銷售流程。", lead: "主辦方第一堂已教過 AI 基礎、提示詞、生圖、生影片與文件，本堂課要把 AI 放到一個能檢查的工作流程裡。", points: [["不重講基礎", "不再停留在「AI 是什麼」或「怎麼問問題」。"], ["進入實作流程", "用 GPT + Codex 協助完成 MorPage 測試商品流程。"], ["看得到結果", "每段操作都有成功標準，不靠感覺猜。"]], notes: ["降低學員焦慮：不用會寫程式。", "強調今天不是 AI 開發課。", "用「陪你完成流程」取代「學會技術」。", "轉場到今天完成後的成果。"] },
+      { kind: "concept", theme: "dark center", label: "03 今天要完成什麼", eyebrow: "三個成果", title: "完成，不只是聽懂。", lead: "課後學員要能登入 Codex、讓 Codex 讀 MorPage SOP、完成一份自己的 Agent 工作流草稿。", points: [["登入 Codex", "知道從哪裡開始，能進到主畫面。"], ["讀 MorPage SOP", "讓 Codex 用腳本引導，而不是自己亂猜。"], ["草擬 Agent 工作流", "把今天流程轉成自己的助理雛形。"]], notes: ["這頁用完成感建立期待。", "三個成果由淺到深：登入、照 SOP、工作流。", "不承諾正式上線或自動成交。", "轉場到 Agent 名詞。"] },
+      { kind: "table", theme: "light", label: "04 Agent 是什麼", eyebrow: "車子比喻", title: "先不用記英文，先記角色和工作方式。", rows: [["LLM", "燃料：提供思考與文字能力"], ["Agent", "車子：依任務不同，選不同工作助理"], ["Prompt", "導航：告訴它目的地與限制"], ["Tool", "工具箱：開瀏覽器、讀檔案、做動作"], ["Skill / SOP", "駕駛流程：照步驟，降低出錯"], ["Memory", "交接手冊：記住背景與偏好"], ["MorPage 腳本", "網站操作 SOP：今天實作的路線圖"]], notes: ["這頁不要深入技術。", "可以說我們不是拆引擎，是學會上路。", "MorPage 腳本就是今天的駕駛流程。", "轉場到 ChatGPT 與 Codex 分工。"] },
+      { kind: "compare", theme: "light", label: "05 ChatGPT vs Codex", eyebrow: "分工觀念", title: "ChatGPT 像顧問，Codex 像工作助理。", leftTitle: "ChatGPT：幫你想", left: ["商品名稱", "文案與賣點", "銷售頁素材", "回覆草稿"], rightTitle: "Codex：陪你做", right: ["讀 SOP", "整理工作區", "開內建瀏覽器", "照流程驗證"], notes: ["用顧問和助理區分，不講模型細節。", "ChatGPT 先產素材，Codex 帶流程。", "不是哪個比較好，是用途不同。", "轉場到完整路線圖。"] },
+      { kind: "flow", theme: "dark", label: "06 完整流程地圖", eyebrow: "今天的路線", title: "從商品想法，到回列表驗證。", steps: [["01", "先產素材", "商品想法 → GPT 產生商品素材。"], ["02", "交給 Codex", "Codex 讀 MorPage SOP，開啟內建瀏覽器。"], ["03", "學員操作", "登入 MorPage，由 Codex 引導建立測試商品。"], ["04", "人工確認", "確認後儲存，回列表驗證。"], ["05", "工作流", "把流程轉成自己的 Agent 草稿。"]], footer: "「追求目標目前不穩定」，本課程不列入正式操作教學。", notes: ["建立安全邊界：今天不是全自動。", "強調每段都要驗證。", "追求目標只提醒，不教操作。", "轉場到 Codex 下載。"] },
+      { kind: "action", theme: "light", label: "07 Codex 下載", eyebrow: "操作 01", title: "Codex 下載", img: "01_codex_website_link.png", say: "先確認下載來源。", doText: "打開 Codex 官方下載頁。", success: "看到可下載的安裝檔。", caution: "不要下載來路不明的安裝檔。", notes: ["先讓學員確認網址與下載來源。", "不要急著執行任何不明檔案。", "成功標準是看到下載入口。", "轉場到選擇下載版本。"] },
+      { kind: "action", theme: "light", label: "08 下載選擇", eyebrow: "操作 02", title: "選擇 Windows 下載", img: "02_download_choice.png", say: "Windows 學員選 Windows 安裝檔。", doText: "依自己的作業系統選擇下載。", success: "下載列或資料夾出現安裝檔。", caution: "Mac 與 Windows 畫面可能不同，跟自己的電腦選。", notes: ["提醒學員不要跟旁邊同學作業系統混淆。", "老師可口頭補充 Mac 版本差異。", "這頁只求成功下載。", "轉場到執行安裝檔。"] },
+      { kind: "action", theme: "light", label: "09 執行安裝檔", eyebrow: "操作 03", title: "下載完成，點選 EXE", img: "03_download_complete_click_exe.png", say: "下載完成後才點安裝檔。", doText: "在瀏覽器下載列或下載資料夾點開 EXE。", success: "看到 Windows 安裝或儲存提示。", caution: "若瀏覽器擋下，先看清楚檔名與來源。", notes: ["這是很多初學者會卡住的地方。", "提醒學員可以從下載資料夾找。", "不要同時重複下載多份。", "轉場到儲存與安裝。"] },
+      { kind: "action", theme: "light", label: "10 儲存與安裝", eyebrow: "操作 04", title: "點選存檔，開始安裝", img: "04_save_installer.png", say: "Windows 可能會要求確認存檔。", doText: "按下存檔，接著依畫面啟動安裝。", success: "看到安裝進度或 Codex 啟動畫面。", caution: "若有系統安全提示，先確認名稱再繼續。", notes: ["老師可以巡場協助 Windows 安全提示。", "這頁不用講太多系統設定。", "重點是讓學員完成安裝。", "轉場到安裝中畫面。"] },
+      { kind: "action", theme: "light", label: "11 安裝進行中", eyebrow: "操作 05", title: "等待 Codex 安裝完成", img: "06_installing.png", say: "安裝時不要急著重複點。", doText: "等待安裝進度跑完。", success: "Codex 開啟或出現登入頁。", caution: "如果卡太久，再請助教協助檢查。", notes: ["讓學員知道等待是正常的。", "避免有人重複開啟多個安裝程式。", "成功標準是進入 Codex。", "轉場到 OAuth 登入。"] },
+      { kind: "action", theme: "light", label: "12 ChatGPT OAuth 登入", eyebrow: "操作 06", title: "用 ChatGPT / OpenAI 帳號登入", img: "07_codex_login_page.png", say: "Codex 使用 ChatGPT / OpenAI 帳號登入。", doText: "點登入，完成 OAuth。", success: "看到 Codex 主畫面或登入成功頁。", caution: "密碼與驗證碼由本人輸入，不交給 AI。", notes: ["強調帳密由本人輸入。", "OAuth 是授權登入，不是把密碼給 Codex。", "若有驗證碼，讓學員自己處理。", "轉場到登入成功。"] },
+      { kind: "action", theme: "light", label: "13 登入成功", eyebrow: "操作 07", title: "確認登入完成", img: "10_login_success.png", say: "登入後回到 Codex。", doText: "確認畫面顯示登入成功或可進入主畫面。", success: "能開始輸入第一句指令。", caution: "不要把登入畫面截圖分享給陌生人。", notes: ["這裡給學員一個小休息點。", "確認大家都已進入 Codex。", "下一步才開始說主畫面。", "轉場到 Codex 主畫面。"] },
+      { kind: "action", theme: "light", label: "14 Codex 主畫面", eyebrow: "操作 08", title: "認識任務開始的位置", img: "11_codex_main_clean.png", say: "這裡是任務開始的地方。", doText: "輸入第一句測試指令。", success: "Codex 能用繁體中文回覆。", caution: "新聊天、專案、檔案位置要分清楚。", notes: ["把主畫面當成工作桌。", "不要急著介紹所有功能。", "先讓學員完成第一句測試。", "轉場到左側選單。"] },
+      { kind: "action", theme: "light", label: "15 左側選單", eyebrow: "操作 09", title: "新聊天、搜尋、外掛、專案", img: "14_left_sidebar.png", say: "左側是管理工作的入口。", doText: "看見新聊天、搜尋、外掛程式、自動化、專案、設定。", success: "知道要開新任務時從哪裡開始。", caution: "今天不深入自動化與追求目標。", notes: ["只介紹和今天相關的入口。", "讓學員知道不是每個功能都要現場學。", "專案與檔案位置後面會用到。", "轉場到模型與速度。"] },
+      { kind: "action", theme: "light", label: "16 模型與智慧功能", eyebrow: "操作 10", title: "模型、智慧功能與速度", img: "15_model_reasoning_speed_menu.png", say: "不同任務需要不同思考強度。", doText: "找到模型、智慧功能低/中/高/超高與快速模式。", success: "知道高智慧較慢，快速模式較快。", caution: "現場跟做以穩定與清楚為主，不追求最炫設定。", notes: ["用簡單比喻：思考越深，速度可能越慢。", "初學者不用糾結每個模型差異。", "建議今天用穩定設定。", "轉場到權限。"] },
+      { kind: "action", theme: "light", label: "17 權限選擇", eyebrow: "操作 11", title: "權限越高，越需要確認", img: "17_permission_menu.png", say: "權限控制 Codex 能做多少事。", doText: "理解預設權限、自動審核、完整存取權的差異。", success: "知道哪些操作要停下來確認。", caution: "正式金流、刪除、匯出、真實訂單都不能自動放行。", safety: "高風險操作三原則：先停、先看、先確認。", notes: ["這頁是安全核心。", "權限不是越高越好，而是越要看清楚。", "請學員一起念安全三原則。", "轉場到追求目標限制。"] },
+      { kind: "action", theme: "light", label: "18 追求目標不列入", eyebrow: "穩定性提醒", title: "追求目標目前不穩定", img: "33_goal_toggle_unavailable_or_unstable.png", say: "這個功能目前不列入正式操作教學。", doText: "今天改用聊天指令，把完整任務寫清楚。", success: "知道不用在現場設定追求目標。", caution: "若畫面出現「無法設定目標」，不要卡在這裡。", safety: "追求目標目前不穩定，不列入正式操作教學。", notes: ["把可能卡關的點先排除。", "不是學員做錯，是功能不穩定。", "我們用更穩的聊天指令完成任務。", "轉場到附加檔案。"] },
+      { kind: "action", theme: "light", label: "19 新增照片和檔案", eyebrow: "操作 12", title: "先找到 MorPage SOP 檔案", img: "morpage_sop_desktop_file.png", say: "這個檔案就是今天要交給 Codex 的操作腳本。", doText: "在桌面或課堂資料夾找到「龍騰學院-MorPage-Codex-唯一整合版」。", success: "確認檔名正確，準備附加到 Codex。", caution: "只附加課堂提供的 MorPage SOP，不附加私人資料。", notes: ["這是從聊天變成工作流程的關鍵。", "先讓學員認得桌面上的 SOP 檔案。", "提醒不要亂附加個人檔案。", "轉場到選取腳本。"] },
+      { kind: "action", theme: "light", label: "20 MorPage SOP 附加", eyebrow: "操作 13", title: "選取 MorPage SOP 腳本", img: "24_select_morpage_script_file.png", say: "MorPage SOP 是今天的網站操作路線圖。", doText: "在檔案視窗選取 MorPage 腳本。", success: "檔案附加到聊天框。", caution: "不要把客戶名單、訂單或個資檔案一起附上。", notes: ["明確說 MorPage SOP 附加的目的。", "SOP 讓 Codex 有固定步驟可跟。", "私人資料不要附上。", "轉場到送出檔案。"] },
+      { kind: "action", theme: "light", label: "21 檔案附加後送出", eyebrow: "操作 14", title: "讓 Codex 讀取 SOP", img: "25_file_attached_processing.png", say: "檔案附加後要送出，Codex 才能讀。", doText: "確認檔案在聊天框，按送出。", success: "Codex 開始讀取或整理腳本。", caution: "若沒看到檔名，先不要送出。", notes: ["這頁處理初學者常見錯誤：選了但沒附上。", "讓學員確認檔名。", "成功是 Codex 開始回應腳本內容。", "轉場到輸入任務指令。"] },
+      { kind: "prompt", theme: "dark", label: "22 輸入引導網站指令", eyebrow: "請學員貼上", title: "請引導我操作網站", code: "請根據這份 MorPage 操作腳本，引導我操作網站。\n請使用 Codex 內建瀏覽器開啟 MorPage 後台。\n所有儲存、刪除、匯出、正式金流、真實訂單處理前，都要先停下來讓我確認。", notes: ["這段指令是今天的安全護欄。", "一定要講出高風險操作前停下來。", "學員可以直接貼上，不需要自己改寫。", "轉場到內建瀏覽器。"] },
+      { kind: "action", theme: "light", label: "23 Codex 讀取腳本", eyebrow: "操作 15", title: "確認 Codex 已讀到腳本", img: "29_attached_file_full_access_prompt.png", say: "Codex 會先理解 SOP，再開始操作。", doText: "看 Codex 是否摘要或提出下一步。", success: "Codex 能說出 MorPage 操作方向。", caution: "如果它想做高風險操作，先停下來確認。", notes: ["讓學員知道 Codex 不是直接亂按。", "讀檔後會先理解任務。", "若要求權限，先看清楚。", "轉場到開啟內建瀏覽器。"] },
+      { kind: "action", theme: "light", label: "24 Codex 內建瀏覽器", eyebrow: "操作 16", title: "開啟 MorPage 後台", img: "30_morpage_open_in_codex_browser.png", say: "Codex 內建瀏覽器讓 AI 能看同一個網站畫面。", doText: "讓 Codex 開啟 MorPage 後台。", success: "MorPage 頁面出現在 Codex 右側或瀏覽器區。", caution: "登入帳密仍由本人輸入。", notes: ["強調這和一般 ChatGPT 最大差異之一。", "Codex 可以看流程，但帳密不給 AI。", "確認 MorPage 畫面已開。", "轉場到登入。"] },
+      { kind: "action", theme: "light", label: "25 MorPage 登入", eyebrow: "MorPage 01", title: "登入 MorPage 後台", img: "34_morpage_login_page.png", say: "這一步由學員本人操作。", doText: "輸入帳號、密碼與必要驗證。", success: "成功進入 MorPage 後台。", caution: "密碼、驗證碼、雙重驗證不可交給 AI。", notes: ["這頁要講慢一點。", "帳密屬於安全邊界。", "Codex 可以提醒流程，但不能代填密碼。", "轉場到選擇商店。"] },
+      { kind: "action", theme: "light", label: "26 選擇商店", eyebrow: "MorPage 02", title: "選擇今天使用的商店", img: "35_morpage_select_shop.png", say: "先確認進入的是課堂測試商店。", doText: "選擇指定商店。", success: "看到該商店的管理功能。", caution: "不要進到正式營運店做測試。", notes: ["確認商店名稱很重要。", "如果學員有多個商店，要選測試用。", "正式店不要做測試商品。", "轉場到商品管理。"] },
+      { kind: "action", theme: "light", label: "27 商品管理入口", eyebrow: "MorPage 03", title: "進入商品管理", img: "36_morpage_product_menu_or_list.png", say: "商品管理是建立銷售台的第一個入口。", doText: "在選單找到商品管理或商品列表。", success: "看到商品列表或新增商品按鈕。", caution: "不要刪除既有商品。", notes: ["讓學員先找到入口，不急著填資料。", "若畫面不同，以商品管理或列表為關鍵字。", "刪除功能完全不碰。", "轉場到新增商品。"] },
+      { kind: "prompt", theme: "dark", label: "28 測試商品資料", eyebrow: "請學員貼上", title: "建立一個測試商品", code: "商品編號：PHYS-001\n商品名稱：質感木紋桌面收納盒\n商品副標題：讓桌面更整齊，文具、小物與日常用品一盒收好\n商品說明：適合放置筆、便利貼、鑰匙、遙控器等桌面小物，木紋外觀簡約耐看，適合辦公桌、書桌與玄關使用。\n規格名稱：顏色\n規格選項：淺木色、深木色\n售價：680\n原價：880\n淺木色庫存：20\n深木色庫存：15\n請先填入資料，不要直接儲存。儲存前請摘要即將送出的欄位，等我確認。", notes: ["這段是商品上架練習資料。", "強調測試商品，不碰正式金流。", "最後兩句是安全重點：先填，不直接儲存。", "轉場到基本資料。"] },
+      { kind: "action", theme: "light", label: "29 商品基本資料", eyebrow: "MorPage 04", title: "填商品基本資料", img: "38_morpage_product_basic_fields.png", say: "先填最容易檢查的欄位。", doText: "填商品編號、名稱、副標題與基本分類欄位。", success: "商品基本資料與提示詞一致。", caution: "不要把正式品牌或客戶資料當測試資料。", notes: ["商品基本資料是第一個檢查點。", "讓 Codex 填資料後，學員自己看一次。", "若欄位名稱不同，以內容對應為主。", "轉場到圖片與說明。"] },
+      { kind: "action", theme: "light", label: "30 圖片與說明", eyebrow: "MorPage 05", title: "商品圖片與說明", img: "41_morpage_product_image_and_description.png", say: "圖片由學員手動上傳，AI 不代處理私人素材。", doText: "手動上傳測試圖片，填商品說明。", success: "圖片顯示正常，說明文字清楚。", caution: "不要上傳含個資、授權不明或正式素材。", notes: ["圖片是安全與授權敏感點。", "AI 可以提醒位置，但學員自己選檔。", "商品說明要能讓客戶看懂。", "轉場到規格欄位。"] },
+      { kind: "action", theme: "light", label: "31 規格設定", eyebrow: "MorPage 06", title: "建立規格名稱", img: "38b_morpage_product_spec_fields.png", say: "規格讓客戶能選擇商品變體。", doText: "輸入規格名稱：顏色。", success: "畫面出現顏色規格欄位。", caution: "規格名稱要短、清楚、客戶看得懂。", notes: ["先填規格名稱，不急著填價格。", "顏色是簡單好理解的範例。", "讓學員知道規格會影響庫存。", "轉場到規格選項。"] },
+      { kind: "action", theme: "light", label: "32 規格選項", eyebrow: "MorPage 07", title: "填規格選項", img: "38c_morpage_product_variation_option.png", say: "每個選項都要能對應到價格與庫存。", doText: "輸入淺木色、深木色。", success: "兩個選項都出現在規格清單。", caution: "不要建立過多選項，初學練習先簡單。", notes: ["規格選項要和前面商品資料一致。", "若系統要求新增一列，依畫面操作。", "確認兩個選項都存在。", "轉場到價格庫存。"] },
+      { kind: "action", theme: "light", label: "33 價格庫存", eyebrow: "MorPage 08", title: "填價格與庫存", img: "39_40_morpage_price_and_stock_fields.png", say: "價格與庫存是儲存前一定要核對的欄位。", doText: "填售價 680、原價 880、庫存 20 與 15。", success: "每個規格都有正確價格與庫存。", caution: "正式商品價格不可由 AI 自動決定。", notes: ["價格是高風險欄位之一。", "測試資料可以跟做，正式商品要人工確認。", "提醒不要少填某個規格庫存。", "轉場到儲存前確認。"] },
+      { kind: "action", theme: "light", label: "34 儲存前人工確認", eyebrow: "MorPage 09", title: "儲存前請 Codex 摘要", img: "42_morpage_save_button_with_codex_confirmation.png", say: "按儲存前一定要停下來。", doText: "請 Codex 摘要即將送出的欄位，再由學員確認。", success: "摘要內容與畫面欄位一致。", caution: "未確認前不要按儲存。", safety: "高風險操作三原則：先停、先看、先確認。", notes: ["這是整堂課最重要的安全動作。", "讓學員養成送出前摘要。", "老師可示範如何讀摘要。", "轉場到列表驗證。"] },
+      { kind: "action", theme: "light", label: "35 儲存後列表驗證", eyebrow: "MorPage 10", title: "回列表驗證", img: "45_morpage_product_list_verify.png", say: "完成不是按儲存，而是儲存後能驗證。", doText: "回到商品列表，搜尋或查看測試商品。", success: "看到商品名稱、編號、價格或狀態正確。", caution: "如果找不到商品，先檢查是否真的儲存成功。", notes: ["把驗證當成工作流程的一部分。", "不是做完就關掉。", "列表上能看到才算完成。", "轉場到銷售頁管理入口。"] },
+      { kind: "action", theme: "light", label: "36 銷售頁管理入口", eyebrow: "MorPage 11", title: "找到銷售頁管理", img: "46_morpage_sales_page_management.png", say: "銷售台不只商品，還要知道銷售頁入口。", doText: "在後台找到銷售頁管理。", success: "看到銷售頁列表或管理入口。", caution: "今天只看入口，不填銷售頁表單。", notes: ["這頁延伸銷售台概念。", "不進入複雜銷售頁表單。", "讓學員知道下一步在哪裡。", "轉場到建立入口。"] },
+      { kind: "action", theme: "light", label: "37 建立銷售頁入口", eyebrow: "MorPage 12", title: "看到建立銷售頁按鈕", img: "47_morpage_sales_page_create_button.png", say: "確認入口存在即可。", doText: "找到新增或建立銷售頁按鈕。", success: "知道未來要從哪裡建立銷售頁。", caution: "不使用銷售頁表單截圖 48，不在本堂細填。", notes: ["這頁明確說今天跳過表單。", "避免課程時間被新流程拉走。", "把重點拉回商品上架與驗證。", "轉場到檢查清單。"] },
+      { kind: "check", theme: "dark", label: "38 MorPage 銷售台檢查清單", eyebrow: "驗證清單", title: "商品存在，不代表銷售台已準備好。", items: ["商品是否已建立", "商品名稱與編號是否正確", "圖片是否需要人工確認", "商品說明是否清楚", "規格是否完整", "價格與庫存是否正確", "是否需要建立銷售頁", "哪些地方上架前一定要人工確認"], notes: ["這頁把操作轉成檢查表。", "讓學員知道銷售台是一組流程。", "每項都可以請 Codex 協助檢查。", "轉場到 AI 可以做什麼。"] },
+      { kind: "check", theme: "light", label: "39 AI 可以協助", eyebrow: "能力邊界", title: "AI 最適合協助流程，不是替你亂按。", items: ["開頁面與找入口", "引導流程與填測試資料", "檢查欄位是否漏填", "摘要即將送出的內容", "儲存後讀回驗證", "整理下一次可重複使用的 SOP"], notes: ["讓學員看到 AI 的實用價值。", "重點是會停、會問、會驗證。", "AI 不是拿來亂點網站。", "轉場到不能交給 AI 的事。"] },
+      { kind: "check", theme: "light", label: "40 一定要人工確認", eyebrow: "安全邊界", title: "這些事，不交給 AI 自動處理。", items: ["密碼與驗證碼", "正式金流設定", "正式刪除與正式匯出", "真實訂單處理", "客戶個資下載", "法律、稅務與合約判斷", "未確認的對外公開內容"], footer: "高風險操作三原則：先停、先看、先確認。", notes: ["這頁需要重複安全邊界。", "正式金流、刪除、匯出都不能放行。", "客戶個資要特別提醒。", "轉場到 Agent 工作流。"] },
+      { kind: "concept", theme: "dark", label: "41 專屬 AI Agent 工作流", eyebrow: "第二大段", title: "不是開發 Agent，而是設計你的任務流程。", lead: "把工作拆成輸入、SOP、AI 可以做的事、AI 不能做的事、人工確認點與最後輸出。", points: [["商品上架 Agent", "協助整理商品素材、填測試欄位、儲存前摘要。"], ["銷售頁檢查 Agent", "依清單檢查文字、圖片、價格、CTA。"], ["客戶回覆 Agent", "整理訊息、草擬回覆，但不自動送出。"]], notes: ["把焦點從工具轉成流程設計。", "學員不用會開發。", "只要能描述任務，AI 就比較能幫忙。", "轉場到更多範例。"] },
+      { kind: "concept", theme: "light", label: "42 Agent 範例方向", eyebrow: "可選題目", title: "從你每天重複做的工作開始。", lead: "不要一開始就做很大的全自動系統，先選一個小而常發生的流程。", points: [["社群內容 Agent", "把商品賣點轉成貼文、短影音腳本與標題。"], ["課程招生 Agent", "整理課程亮點、FAQ、私訊回覆草稿。"], ["行政整理 Agent", "整理文件、會議記錄、待辦清單。"], ["收支整理輔助 Agent", "協助分類資料，但不做稅務判斷。"]], notes: ["鼓勵學員選小流程。", "每個範例都要有人工確認。", "不要一開始追求全自動。", "轉場到模板。"] },
+      { kind: "template", theme: "light", label: "43 Agent 工作流模板", eyebrow: "學員填寫", title: "我的專屬 AI Agent 工作流", code: "# Agent 名稱\n\n## 它主要幫我完成什麼任務\n\n## 我會提供哪些資料\n\n## 它要照什麼 SOP 做事\n\n## 它可以幫我做什麼\n\n## 它不能幫我做什麼\n\n## 哪些地方一定要人工確認\n\n## 最後輸出格式", notes: ["這頁就是學員要填的模板。", "可以先填一個最小版本。", "一定要填不能做什麼與人工確認。", "轉場到實作時間。"] },
+      { kind: "check", theme: "dark", label: "44 學員實作時間與常見卡關", eyebrow: "現場操作", title: "卡住時，先回到流程。", items: ["找不到檔案：回到工作區或下載資料夾", "Codex 沒讀到 SOP：確認檔案有附加並送出", "MorPage 畫面不同：找同義入口，例如商品管理、商品列表", "不確定能不能按：先停下來問老師", "儲存後找不到：回列表搜尋商品名稱或編號"], notes: ["這頁是助教巡場時的共同語言。", "把卡關分成檔案、SOP、頁面、權限、驗證。", "不確定就停，這是正確行為。", "轉場到成果檢查表。"] },
+      { kind: "check", theme: "light", label: "45 今日成果檢查表", eyebrow: "收尾", title: "今天完成什麼？", items: ["能登入 Codex", "能說出 ChatGPT 與 Codex 差異", "能附加 MorPage SOP 腳本", "能讓 Codex 引導操作 MorPage", "完成測試商品建立流程", "知道哪些操作不能交給 AI", "完成一份自己的 Agent 工作流草稿"], footer: "回家作業：選一個自己的重複工作，把它寫成 Agent 工作流模板。", notes: ["用檢查表收斂成果。", "提醒大家今天已經完成一個流程。", "回家作業要小而具體。", "最後再次提醒安全三原則。"] }
+    ];
+
+    function esc(text) {
+      return String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+    }
+    function notesHtml(notes) {
+      return `<aside class="notes">${(notes || []).map(line => `<p>${esc(line)}</p>`).join("")}</aside>`;
+    }
+    function cardGrid(cards) {
+      return `<div class="hero-flow">${cards.map(([h, p]) => `<div class="plain-card"><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>`;
+    }
+    function pointsGrid(points) {
+      const klass = points.length === 4 ? "four-grid" : points.length === 2 ? "two-grid" : "three-grid";
+      return `<div class="${klass}">${points.map(([h, p]) => `<div class="plain-card"><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>`;
+    }
+    function slideInner(s) {
+      if (s.kind === "hero") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h1 class="h-hero">${esc(s.title)}</h1><p class="lead">${esc(s.lead)}</p>${cardGrid(s.cards || [])}`;
+      }
+      if (s.kind === "concept") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-xl">${esc(s.title)}</h2><p class="lead">${esc(s.lead)}</p>${pointsGrid(s.points || [])}`;
+      }
+      if (s.kind === "table") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="check-list">${s.rows.map(([h, p], i) => `<li><strong>${String(i + 1).padStart(2, "0")}</strong>${esc(h)}：${esc(p)}</li>`).join("")}</div>`;
+      }
+      if (s.kind === "compare") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="two-grid"><div class="plain-card"><h3>${esc(s.leftTitle)}</h3><ul>${s.left.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div><div class="plain-card"><h3>${esc(s.rightTitle)}</h3><ul>${s.right.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>`;
+      }
+      if (s.kind === "flow") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="flow-list">${s.steps.map(([n, h, p]) => `<div class="step-box"><span class="num">${esc(n)}</span><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>${s.footer ? `<div class="safety-strip">${esc(s.footer)}</div>` : ""}`;
+      }
+      if (s.kind === "action") {
+        return `<div class="screen-layout"><figure class="screenshot-frame"><img src="assets/screenshots/${esc(s.img)}" alt="${esc(s.title)}截圖" /></figure><div class="teacher-panel"><p class="eyebrow">${esc(s.eyebrow)}</p><h2>${esc(s.title)}</h2><ul class="teach-list"><li><strong>老師說</strong><span>${esc(s.say)}</span></li><li><strong>學員做</strong><span>${esc(s.doText)}</span></li><li><strong>成功標準</strong><span>${esc(s.success)}</span></li><li class="warn"><strong>注意事項</strong><span>${esc(s.caution)}</span></li></ul>${s.safety ? `<div class="safety-strip">${esc(s.safety)}</div>` : ""}</div></div>`;
+      }
+      if (s.kind === "prompt" || s.kind === "template") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="template-box"><p class="lead">${s.kind === "prompt" ? "請學員直接貼上或依自己的商品資料替換。重點是把限制寫清楚。" : "請學員照模板填寫，先完成一個可交辦、可檢查的小流程。"}</p><pre class="template-code">${esc(s.code)}</pre></div>`;
+      }
+      if (s.kind === "check") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><ul class="check-list">${s.items.map((x, i) => `<li><strong>${String(i + 1).padStart(2, "0")}</strong>${esc(x)}</li>`).join("")}</ul>${s.footer ? `<div class="safety-strip">${esc(s.footer)}</div>` : ""}`;
+      }
+      return "";
+    }
+
+    const deck = document.getElementById("deck");
+    deck.innerHTML = slides.map((s, i) => {
+      const classes = ["slide"].concat((s.theme || "light").split(" "));
+      return `<section class="${classes.join(" ")}" data-screen-label="${esc(s.label)}" aria-hidden="true">${slideInner(s)}${notesHtml(s.notes)}</section>`;
+    }).join("");
+
+    (function () {
+      const els = Array.from(document.querySelectorAll(".slide"));
+      const counter = document.getElementById("deck-counter");
+      const progress = document.getElementById("deck-progress");
+      const KEY = "morpage-full-deck-pos";
+      let active = 0;
+      function setActive(i) {
+        active = Math.max(0, Math.min(els.length - 1, i));
+        els.forEach((slide, index) => {
+          slide.classList.toggle("is-active", index === active);
+          slide.classList.toggle("is-before", index < active);
+          slide.setAttribute("aria-hidden", index === active ? "false" : "true");
+        });
+        counter.textContent = `${active + 1} / ${els.length}`;
+        progress.style.width = `${((active + 1) / els.length) * 100}%`;
+        try { localStorage.setItem(KEY, String(active)); } catch (_) {}
+      }
+      function onKey(e) {
+        const t = e.target;
+        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); setActive(active + 1); }
+        else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); setActive(active - 1); }
+        else if (e.key === "Home") { e.preventDefault(); setActive(0); }
+        else if (e.key === "End") { e.preventDefault(); setActive(els.length - 1); }
+      }
+      window.addEventListener("keydown", onKey, true);
+      document.body.setAttribute("tabindex", "-1");
+      document.body.style.outline = "none";
+      document.addEventListener("mousedown", () => { try { window.focus(); document.body.focus({ preventScroll: true }); } catch (_) {} });
+      try {
+        const saved = parseInt(localStorage.getItem(KEY) || "0", 10);
+        setActive(Number.isFinite(saved) ? saved : 0);
+      } catch (_) {
+        setActive(0);
+      }
+    })();
+  </script>
+</body>
+</html>
