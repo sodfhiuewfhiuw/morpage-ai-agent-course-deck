@@ -32,6 +32,8 @@
       font-size: 18px;
       line-height: 1.5;
       overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -245,7 +247,7 @@
   <main id="deck" aria-live="polite"></main>
   <div class="deck-progress" id="deck-progress" aria-hidden="true"></div>
   <div class="deck-counter" id="deck-counter">1 / 45</div>
-  <div class="deck-hint">← / → · Home · End</div>
+  <div class="deck-hint">← / → · 滑動 · 點左右半邊</div>
 
   <script>
     const slides = [
@@ -368,7 +370,41 @@
         else if (e.key === "Home") { e.preventDefault(); setActive(0); }
         else if (e.key === "End") { e.preventDefault(); setActive(els.length - 1); }
       }
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      function beginTouch(x, y) {
+        touchStartX = x;
+        touchStartY = y;
+        touchStartTime = Date.now();
+      }
+      function finishTouch(x, y) {
+        const dx = x - touchStartX;
+        const dy = y - touchStartY;
+        const elapsed = Date.now() - touchStartTime;
+        if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+          setActive(active + (dx < 0 ? 1 : -1));
+          return;
+        }
+        if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && elapsed < 420) {
+          setActive(active + (x > window.innerWidth / 2 ? 1 : -1));
+        }
+      }
       window.addEventListener("keydown", onKey, true);
+      window.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) beginTouch(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("touchend", (e) => {
+        if (e.changedTouches.length === 1) finishTouch(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        beginTouch(e.clientX, e.clientY);
+      }, true);
+      window.addEventListener("pointerup", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        finishTouch(e.clientX, e.clientY);
+      }, true);
       document.body.setAttribute("tabindex", "-1");
       document.body.style.outline = "none";
       document.addEventListener("mousedown", () => { try { window.focus(); document.body.focus({ preventScroll: true }); } catch (_) {} });
