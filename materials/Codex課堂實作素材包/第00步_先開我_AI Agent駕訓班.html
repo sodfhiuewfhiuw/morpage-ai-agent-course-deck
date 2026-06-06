@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Agent 駕訓班｜Codex 課堂實作素材包</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #5b6472;
+      --line: #d8dee8;
+      --paper: #ffffff;
+      --bg: #f3f6fb;
+      --road: #243447;
+      --accent: #1f5fbf;
+      --accent-soft: #e8f0ff;
+      --warn: #9a3412;
+      --warn-soft: #fff7ed;
+      --ok: #166534;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #eef5ff 0, rgba(238,245,255,0) 420px),
+        var(--bg);
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 60px; }
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 38px 34px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 20px 54px rgba(15, 23, 42, .1);
+    }
+    header:after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: 22px;
+      width: 460px;
+      height: 76px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(90deg, var(--road) 0 58px, #facc15 58px 76px);
+      opacity: .12;
+      transform: rotate(-8deg);
+    }
+    .kicker { color: var(--accent); font-weight: 900; letter-spacing: .08em; }
+    h1 { margin: 10px 0 14px; font-size: clamp(34px, 5vw, 60px); line-height: 1.05; }
+    .lead { max-width: 820px; font-size: 21px; line-height: 1.75; color: #2b3442; }
+    .metaphor {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    .metaphor div {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 96px;
+    }
+    .metaphor strong { display: block; margin-bottom: 6px; font-size: 18px; color: var(--ink); }
+    .metaphor span { color: var(--muted); line-height: 1.5; }
+    .rule {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .rule div {
+      background: var(--accent-soft);
+      border: 1px solid #cfe0ff;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .safety {
+      margin-top: 18px;
+      padding: 18px 22px;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      background: var(--warn-soft);
+      color: var(--warn);
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .quick {
+      margin: 22px 0;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .quick a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 8px;
+      font-weight: 900;
+    }
+    .card {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 18px;
+      margin: 16px 0;
+      padding: 22px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+    }
+    .badge {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 138px;
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(160deg, #1f5fbf, #243447);
+      padding: 18px;
+    }
+    .badge span { font-size: 18px; font-weight: 800; opacity: .92; }
+    .badge strong { display: block; margin-top: 8px; font-size: 28px; line-height: 1.2; }
+    h2 { margin: 0; font-size: 28px; }
+    .vehicle { margin: 8px 0 10px; font-size: 18px; color: #374151; line-height: 1.6; }
+    .folder { margin: 0 0 16px; color: var(--muted); font-weight: 800; }
+    a { color: var(--accent); }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr .85fr .85fr;
+      gap: 12px;
+    }
+    .grid div {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fbfcff;
+      min-height: 142px;
+    }
+    .grid .safe {
+      margin: 0;
+      font-size: 16px;
+      color: var(--warn);
+      background: var(--warn-soft);
+      border-color: #fed7aa;
+    }
+    strong { display: block; margin-bottom: 8px; color: #0f172a; font-size: 18px; }
+    p { margin: 0; line-height: 1.65; }
+    .copy {
+      margin-top: 12px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .copy.done { background: var(--ok); }
+    footer { margin-top: 24px; padding: 22px; color: var(--muted); line-height: 1.8; }
+    @media (max-width: 980px) {
+      .metaphor, .rule, .quick, .grid, .card { grid-template-columns: 1fr; }
+      header { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="kicker">第 00 步｜AI Agent 駕訓班</div>
+      <h1>一句話指揮電腦</h1>
+      <p class="lead">Agent 像一台會跑任務的車。你不是在學程式，而是在學怎麼給目的地、給資料、貼指令，最後看它把工作開到哪裡。</p>
+      <div class="metaphor">
+        <div><strong>Agent</strong><span>整台車，負責把任務跑完。</span></div>
+        <div><strong>LLM</strong><span>引擎，決定理解與推理能力。</span></div>
+        <div><strong>Token</strong><span>油箱容量，一次能載多少資料。</span></div>
+        <div><strong>Skill</strong><span>駕駛手冊，固定做事規則。</span></div>
+        <div><strong>安全邊界</strong><span>煞車，高風險先停。</span></div>
+      </div>
+      <div class="rule">
+        <div>1. 先丟資料</div>
+        <div>2. 再貼提示詞</div>
+        <div>3. 高風險先煞車</div>
+      </div>
+      <div class="safety">主軸：AI 可以代做流程，但不能代替你做風險決定。</div>
+    </header>
+
+    <nav class="quick">
+      <a href="#ex01">第 01 站</a><a href="#ex02">第 02 站</a><a href="#ex03">第 03 站</a><a href="#ex04">第 04 站</a><a href="#ex05">第 05 站</a><a href="#ex06">第 06 站</a><a href="#ex07">第 07 站</a>
+    </nav>
+
+    
+            <section class="card" id="ex01">
+              <div class="badge">
+                <span>第 01 站</span>
+                <strong>整理車庫</strong>
+              </div>
+              <div class="card-body">
+                <h2>混亂資料夾盤點</h2>
+                <p class="vehicle">把一個亂車庫整理成可以找得到東西的工作區。</p>
+                <p class="folder"><a href="01_第01站_整理車庫_混亂資料夾/先開我_第01站任務卡.html">打開任務卡</a> ｜ <a href="01_第01站_整理車庫_混亂資料夾/">01_第01站_整理車庫_混亂資料夾</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>給 Codex 這個資料夾路徑，不是丟單一檔案。</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請先盤點這個資料夾，不要刪除任何檔案。請列出：檔案類型、疑似重複、可能可歸類的資料夾、建議命名方式、需要我人工確認的地方。最後請產出整理報告。</p><button class="copy" data-copy="請先盤點這個資料夾，不要刪除任何檔案。請列出：檔案類型、疑似重複、可能可歸類的資料夾、建議命名方式、需要我人工確認的地方。最後請產出整理報告。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>分類資料夾建議 + 整理報告</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>不要一開始叫 AI 刪檔。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex02">
+              <div class="badge">
+                <span>第 02 站</span>
+                <strong>會報導航</strong>
+              </div>
+              <div class="card-body">
+                <h2>Excel 銷售月報</h2>
+                <p class="vehicle">把散落的數字開成一條主管看得懂的路線。</p>
+                <p class="folder"><a href="02_第02站_會報導航_Excel銷售月報/先開我_第02站任務卡.html">打開任務卡</a> ｜ <a href="02_第02站_會報導航_Excel銷售月報/">02_第02站_會報導航_Excel銷售月報</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>丟給 Codex：丟給Codex_練習二_銷售月報.xlsx</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請讀取這份 Excel 銷售月報，幫我產出主管會報摘要。請包含：本月重點數字、前三個亮點、三個異常或風險、下個月建議行動，以及一張可貼到簡報的摘要表。</p><button class="copy" data-copy="請讀取這份 Excel 銷售月報，幫我產出主管會報摘要。請包含：本月重點數字、前三個亮點、三個異常或風險、下個月建議行動，以及一張可貼到簡報的摘要表。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>會報摘要工作表</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>沒有指定讀者，AI 很容易寫成流水帳。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex03">
+              <div class="badge">
+                <span>第 03 站</span>
+                <strong>風險煞車</strong>
+              </div>
+              <div class="card-body">
+                <h2>Excel 會計複核</h2>
+                <p class="vehicle">讓 AI 幫你踩第一腳煞車，標出疑點給人確認。</p>
+                <p class="folder"><a href="03_第03站_風險煞車_Excel會計複核/先開我_第03站任務卡.html">打開任務卡</a> ｜ <a href="03_第03站_風險煞車_Excel會計複核/">03_第03站_風險煞車_Excel會計複核</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>丟給 Codex：丟給Codex_練習三_簡單支出與收據.xlsx</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請幫我複核這份支出表。請找出疑似重複付款、缺發票號碼、金額異常、未付款項目。請用表格列出問題、原因、風險等級、建議人工確認方式。不要自行判定違法或刪除資料。</p><button class="copy" data-copy="請幫我複核這份支出表。請找出疑似重複付款、缺發票號碼、金額異常、未付款項目。請用表格列出問題、原因、風險等級、建議人工確認方式。不要自行判定違法或刪除資料。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>會計複核清單</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>疑點不是結論，正式會計資料要人工確認。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex04">
+              <div class="badge">
+                <span>第 04 站</span>
+                <strong>路線規劃</strong>
+              </div>
+              <div class="card-body">
+                <h2>學員名單行政整理</h2>
+                <p class="vehicle">把出席、繳費、作業整理成清楚的行政路線。</p>
+                <p class="folder"><a href="04_第04站_路線規劃_學員名單/先開我_第04站任務卡.html">打開任務卡</a> ｜ <a href="04_第04站_路線規劃_學員名單/">04_第04站_路線規劃_學員名單</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>丟給 Codex：丟給Codex_練習四_課程學員名單.xlsx</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請整理這份學員名單，幫我列出未出席、未繳費、未交作業、需要關懷提醒的學員。請依照分組整理成行政待辦清單，並附上建議提醒文字。</p><button class="copy" data-copy="請整理這份學員名單，幫我列出未出席、未繳費、未交作業、需要關懷提醒的學員。請依照分組整理成行政待辦清單，並附上建議提醒文字。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>行政待辦名單</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>不要只叫 AI 看名單，要指定它輸出待辦。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex05">
+              <div class="badge">
+                <span>第 05 站</span>
+                <strong>連續駕駛</strong>
+              </div>
+              <div class="card-body">
+                <h2>Word 摘要與 PPT 大綱</h2>
+                <p class="vehicle">從會議紀錄一路開到主管摘要，再開到簡報大綱。</p>
+                <p class="folder"><a href="05_第05站_連續駕駛_Word與PPT/先開我_第05站任務卡.html">打開任務卡</a> ｜ <a href="05_第05站_連續駕駛_Word與PPT/">05_第05站_連續駕駛_Word與PPT</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>先丟 Word 練習檔；PPT 檔等老師說再開。</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請把這份會議內容整理成一頁主管摘要，包含會議目的、三個重點、決議事項、待辦事項、負責人、期限。接著請規劃 6 頁會報簡報大綱，每頁只放一個主題。</p><button class="copy" data-copy="請把這份會議內容整理成一頁主管摘要，包含會議目的、三個重點、決議事項、待辦事項、負責人、期限。接著請規劃 6 頁會報簡報大綱，每頁只放一個主題。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>一頁主管摘要 + 6 頁會報大綱</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>PPT 不要塞滿字，每頁只放一個主題。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex06">
+              <div class="badge">
+                <span>第 06 站</span>
+                <strong>故障排查</strong>
+              </div>
+              <div class="card-body">
+                <h2>電腦出問題時請 Agent 排查並解決</h2>
+                <p class="vehicle">電腦變慢、過熱、當機、檔案找不到、Office 打不開時，先讓 Agent 排查，再一步步帶你解決。</p>
+                <p class="folder"><a href="06_第06站_故障排查_電腦問題診斷/先開我_第06站任務卡.html">打開任務卡</a> ｜ <a href="06_第06站_故障排查_電腦問題診斷/">06_第06站_故障排查_電腦問題診斷</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>不用先丟檔案。先把電腦症狀、錯誤訊息、發生時間、最近做過什麼告訴 Codex。</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>我的電腦現在遇到一個問題，可能是變慢、過熱、當機、檔案找不到、Office 打不開或 Chrome 異常。請先不要刪除、下載、關閉防毒或修改系統設定。請先問我 3 到 5 個必要問題，確認症狀、發生時間、影響範圍、最近是否安裝新軟體或移動檔案。接著請列出可能原因，並依照「低風險可先做」「需要我確認」「不要自己做」三類給我解決步驟。每一步請說明目的、怎麼做、做完要觀察什麼。</p><button class="copy" data-copy="我的電腦現在遇到一個問題，可能是變慢、過熱、當機、檔案找不到、Office 打不開或 Chrome 異常。請先不要刪除、下載、關閉防毒或修改系統設定。請先問我 3 到 5 個必要問題，確認症狀、發生時間、影響範圍、最近是否安裝新軟體或移動檔案。接著請列出可能原因，並依照「低風險可先做」「需要我確認」「不要自己做」三類給我解決步驟。每一步請說明目的、怎麼做、做完要觀察什麼。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>問題排查清單 + 低風險解決步驟</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>不要一開始就叫 AI 刪檔、下載工具、關防毒或改系統設定。</p></div>
+                </div>
+              </div>
+            </section>
+            
+            <section class="card" id="ex07">
+              <div class="badge">
+                <span>第 07 站</span>
+                <strong>安全煞車</strong>
+              </div>
+              <div class="card-body">
+                <h2>C 槽清理安全盤點</h2>
+                <p class="vehicle">先讓 AI 做安全檢查，不讓它直接踩油門亂刪。</p>
+                <p class="folder"><a href="07_第07站_安全煞車_C槽假資料/先開我_第07站任務卡.html">打開任務卡</a> ｜ <a href="07_第07站_安全煞車_C槽假資料/">07_第07站_安全煞車_C槽假資料</a></p>
+                <div class="grid">
+                  <div><strong>第 1 步：丟給 Codex 什麼</strong><p>只給 Codex 這個假資料夾路徑，不碰真實 C 槽。</p></div>
+                  <div><strong>第 2 步：再輸入提示詞</strong><p>請盤點這個假資料夾，找出可能的大型檔案、重複檔案、暫存檔、疑似舊版檔案。請產出清理建議表，但不要刪除、移動或覆蓋任何檔案。請標示哪些一定要人工確認。</p><button class="copy" data-copy="請盤點這個假資料夾，找出可能的大型檔案、重複檔案、暫存檔、疑似舊版檔案。請產出清理建議表，但不要刪除、移動或覆蓋任何檔案。請標示哪些一定要人工確認。">複製提示詞</button></div>
+                  <div><strong>到站成果</strong><p>清理建議表，不真的刪</p></div>
+                  <div class="safe"><strong>煞車提醒</strong><p>AI 說可清，不等於可以直接刪。</p></div>
+                </div>
+              </div>
+            </section>
+            
+
+    <footer>
+      <strong>老師提醒</strong>
+      這包資料全部是假資料。學生卡住時，先請他回到這一頁，看清楚「第 1 步丟什麼」和「第 2 步貼什麼」。不要讓學生用自己的真實會計資料、客戶資料或真實 C 槽做第一次練習。
+    </footer>
+  </main>
+  <script>
+    for (const btn of document.querySelectorAll('.copy')) {
+      btn.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = '已複製';
+        btn.classList.add('done');
+        setTimeout(() => {
+          btn.textContent = '複製提示詞';
+          btn.classList.remove('done');
+        }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

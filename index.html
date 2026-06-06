@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GPT + Codex 實戰：打造 MorPage 銷售台與專屬 AI Agent</title>
+  <title>Codex AI Agent 電腦工作助理實戰</title>
   <style>
     :root {
       --bg: #fafafa;
@@ -251,52 +251,1087 @@
 
   <script>
     const slides = [
-      { kind: "hero", theme: "light center", label: "01 封面", eyebrow: "MorPage 實作課 · HTML PPT 完整版", title: "GPT + Codex 實戰", lead: "打造 MorPage 銷售台與專屬 AI Agent，讓學員照著做、看得到成果。", cards: [["ChatGPT", "產生商品素材"], ["Codex", "讀 SOP、帶操作"], ["MorPage", "建立測試商品"], ["銷售台", "回列表驗證"]], notes: ["先說明這是實作課，不是概念課。", "提醒學員今天會跟著畫面一步步操作。", "把 ChatGPT、Codex、MorPage 的分工先放進腦中。", "轉場到今天不做什麼，避免期待落差。"] },
-      { kind: "concept", theme: "light", label: "02 今天不是 AI 初階課", eyebrow: "課程定位", title: "不是重講工具，是把 AI 放進銷售流程。", lead: "主辦方第一堂已教過 AI 基礎、提示詞、生圖、生影片與文件，本堂課要把 AI 放到一個能檢查的工作流程裡。", points: [["不重講基礎", "不再停留在「AI 是什麼」或「怎麼問問題」。"], ["進入實作流程", "用 GPT + Codex 協助完成 MorPage 測試商品流程。"], ["看得到結果", "每段操作都有成功標準，不靠感覺猜。"]], notes: ["降低學員焦慮：不用會寫程式。", "強調今天不是 AI 開發課。", "用「陪你完成流程」取代「學會技術」。", "轉場到今天完成後的成果。"] },
-      { kind: "concept", theme: "dark center", label: "03 今天要完成什麼", eyebrow: "三個成果", title: "完成，不只是聽懂。", lead: "課後學員要能登入 Codex、讓 Codex 讀 MorPage SOP、完成一份自己的 Agent 工作流草稿。", points: [["登入 Codex", "知道從哪裡開始，能進到主畫面。"], ["讀 MorPage SOP", "讓 Codex 用腳本引導，而不是自己亂猜。"], ["草擬 Agent 工作流", "把今天流程轉成自己的助理雛形。"]], notes: ["這頁用完成感建立期待。", "三個成果由淺到深：登入、照 SOP、工作流。", "不承諾正式上線或自動成交。", "轉場到 Agent 名詞。"] },
-      { kind: "table", theme: "light", label: "04 Agent 是什麼", eyebrow: "車子比喻", title: "先不用記英文，先記角色和工作方式。", rows: [["LLM", "燃料：提供思考與文字能力"], ["Agent", "車子：依任務不同，選不同工作助理"], ["Prompt", "導航：告訴它目的地與限制"], ["Tool", "工具箱：開瀏覽器、讀檔案、做動作"], ["Skill / SOP", "駕駛流程：照步驟，降低出錯"], ["Memory", "交接手冊：記住背景與偏好"], ["MorPage 腳本", "網站操作 SOP：今天實作的路線圖"]], notes: ["這頁不要深入技術。", "可以說我們不是拆引擎，是學會上路。", "MorPage 腳本就是今天的駕駛流程。", "轉場到 ChatGPT 與 Codex 分工。"] },
-      { kind: "compare", theme: "light", label: "05 ChatGPT vs Codex", eyebrow: "分工觀念", title: "ChatGPT 像顧問，Codex 像工作助理。", leftTitle: "ChatGPT：幫你想", left: ["商品名稱", "文案與賣點", "銷售頁素材", "回覆草稿"], rightTitle: "Codex：陪你做", right: ["讀 SOP", "整理工作區", "開內建瀏覽器", "照流程驗證"], notes: ["用顧問和助理區分，不講模型細節。", "ChatGPT 先產素材，Codex 帶流程。", "不是哪個比較好，是用途不同。", "轉場到完整路線圖。"] },
-      { kind: "flow", theme: "dark", label: "06 完整流程地圖", eyebrow: "今天的路線", title: "從商品想法，到回列表驗證。", steps: [["01", "先產素材", "商品想法 → GPT 產生商品素材。"], ["02", "交給 Codex", "Codex 讀 MorPage SOP，開啟內建瀏覽器。"], ["03", "學員操作", "登入 MorPage，由 Codex 引導建立測試商品。"], ["04", "人工確認", "確認後儲存，回列表驗證。"], ["05", "工作流", "把流程轉成自己的 Agent 草稿。"]], footer: "「追求目標目前不穩定」，本課程不列入正式操作教學。", notes: ["建立安全邊界：今天不是全自動。", "強調每段都要驗證。", "追求目標只提醒，不教操作。", "轉場到 Codex 下載。"] },
-      { kind: "action", theme: "light", label: "07 Codex 下載", eyebrow: "操作 01", title: "Codex 下載", img: "01_codex_website_link.png", say: "先確認下載來源。", doText: "打開 Codex 官方下載頁。", success: "看到可下載的安裝檔。", caution: "不要下載來路不明的安裝檔。", notes: ["先讓學員確認網址與下載來源。", "不要急著執行任何不明檔案。", "成功標準是看到下載入口。", "轉場到選擇下載版本。"] },
-      { kind: "action", theme: "light", label: "08 下載選擇", eyebrow: "操作 02", title: "選擇 Windows 下載", img: "02_download_choice.png", say: "Windows 學員選 Windows 安裝檔。", doText: "依自己的作業系統選擇下載。", success: "下載列或資料夾出現安裝檔。", caution: "Mac 與 Windows 畫面可能不同，跟自己的電腦選。", notes: ["提醒學員不要跟旁邊同學作業系統混淆。", "老師可口頭補充 Mac 版本差異。", "這頁只求成功下載。", "轉場到執行安裝檔。"] },
-      { kind: "action", theme: "light", label: "09 執行安裝檔", eyebrow: "操作 03", title: "下載完成，點選 EXE", img: "03_download_complete_click_exe.png", say: "下載完成後才點安裝檔。", doText: "在瀏覽器下載列或下載資料夾點開 EXE。", success: "看到 Windows 安裝或儲存提示。", caution: "若瀏覽器擋下，先看清楚檔名與來源。", notes: ["這是很多初學者會卡住的地方。", "提醒學員可以從下載資料夾找。", "不要同時重複下載多份。", "轉場到儲存與安裝。"] },
-      { kind: "action", theme: "light", label: "10 儲存與安裝", eyebrow: "操作 04", title: "點選存檔，開始安裝", img: "04_save_installer.png", say: "Windows 可能會要求確認存檔。", doText: "按下存檔，接著依畫面啟動安裝。", success: "看到安裝進度或 Codex 啟動畫面。", caution: "若有系統安全提示，先確認名稱再繼續。", notes: ["老師可以巡場協助 Windows 安全提示。", "這頁不用講太多系統設定。", "重點是讓學員完成安裝。", "轉場到安裝中畫面。"] },
-      { kind: "action", theme: "light", label: "11 安裝進行中", eyebrow: "操作 05", title: "等待 Codex 安裝完成", img: "06_installing.png", say: "安裝時不要急著重複點。", doText: "等待安裝進度跑完。", success: "Codex 開啟或出現登入頁。", caution: "如果卡太久，再請助教協助檢查。", notes: ["讓學員知道等待是正常的。", "避免有人重複開啟多個安裝程式。", "成功標準是進入 Codex。", "轉場到 OAuth 登入。"] },
-      { kind: "action", theme: "light", label: "12 ChatGPT OAuth 登入", eyebrow: "操作 06", title: "用 ChatGPT / OpenAI 帳號登入", img: "07_codex_login_page.png", say: "Codex 使用 ChatGPT / OpenAI 帳號登入。", doText: "點登入，完成 OAuth。", success: "看到 Codex 主畫面或登入成功頁。", caution: "密碼與驗證碼由本人輸入，不交給 AI。", notes: ["強調帳密由本人輸入。", "OAuth 是授權登入，不是把密碼給 Codex。", "若有驗證碼，讓學員自己處理。", "轉場到登入成功。"] },
-      { kind: "action", theme: "light", label: "13 登入成功", eyebrow: "操作 07", title: "確認登入完成", img: "10_login_success.png", say: "登入後回到 Codex。", doText: "確認畫面顯示登入成功或可進入主畫面。", success: "能開始輸入第一句指令。", caution: "不要把登入畫面截圖分享給陌生人。", notes: ["這裡給學員一個小休息點。", "確認大家都已進入 Codex。", "下一步才開始說主畫面。", "轉場到 Codex 主畫面。"] },
-      { kind: "action", theme: "light", label: "14 Codex 主畫面", eyebrow: "操作 08", title: "認識任務開始的位置", img: "11_codex_main_clean.png", say: "這裡是任務開始的地方。", doText: "輸入第一句測試指令。", success: "Codex 能用繁體中文回覆。", caution: "新聊天、專案、檔案位置要分清楚。", notes: ["把主畫面當成工作桌。", "不要急著介紹所有功能。", "先讓學員完成第一句測試。", "轉場到左側選單。"] },
-      { kind: "action", theme: "light", label: "15 左側選單", eyebrow: "操作 09", title: "新聊天、搜尋、外掛、專案", img: "14_left_sidebar.png", say: "左側是管理工作的入口。", doText: "看見新聊天、搜尋、外掛程式、自動化、專案、設定。", success: "知道要開新任務時從哪裡開始。", caution: "今天不深入自動化與追求目標。", notes: ["只介紹和今天相關的入口。", "讓學員知道不是每個功能都要現場學。", "專案與檔案位置後面會用到。", "轉場到模型與速度。"] },
-      { kind: "action", theme: "light", label: "16 模型與智慧功能", eyebrow: "操作 10", title: "模型、智慧功能與速度", img: "15_model_reasoning_speed_menu.png", say: "不同任務需要不同思考強度。", doText: "找到模型、智慧功能低/中/高/超高與快速模式。", success: "知道高智慧較慢，快速模式較快。", caution: "現場跟做以穩定與清楚為主，不追求最炫設定。", notes: ["用簡單比喻：思考越深，速度可能越慢。", "初學者不用糾結每個模型差異。", "建議今天用穩定設定。", "轉場到權限。"] },
-      { kind: "action", theme: "light", label: "17 權限選擇", eyebrow: "操作 11", title: "權限越高，越需要確認", img: "17_permission_menu.png", say: "權限控制 Codex 能做多少事。", doText: "理解預設權限、自動審核、完整存取權的差異。", success: "知道哪些操作要停下來確認。", caution: "正式金流、刪除、匯出、真實訂單都不能自動放行。", safety: "高風險操作三原則：先停、先看、先確認。", notes: ["這頁是安全核心。", "權限不是越高越好，而是越要看清楚。", "請學員一起念安全三原則。", "轉場到追求目標限制。"] },
-      { kind: "action", theme: "light", label: "18 追求目標不列入", eyebrow: "穩定性提醒", title: "追求目標目前不穩定", img: "33_goal_toggle_unavailable_or_unstable.png", say: "這個功能目前不列入正式操作教學。", doText: "今天改用聊天指令，把完整任務寫清楚。", success: "知道不用在現場設定追求目標。", caution: "若畫面出現「無法設定目標」，不要卡在這裡。", safety: "追求目標目前不穩定，不列入正式操作教學。", notes: ["把可能卡關的點先排除。", "不是學員做錯，是功能不穩定。", "我們用更穩的聊天指令完成任務。", "轉場到附加檔案。"] },
-      { kind: "action", theme: "light", label: "19 新增照片和檔案", eyebrow: "操作 12", title: "先找到 MorPage SOP 檔案", img: "morpage_sop_desktop_file.png", say: "這個檔案就是今天要交給 Codex 的操作腳本。", doText: "在桌面或課堂資料夾找到「龍騰學院-MorPage-Codex-唯一整合版」。", success: "確認檔名正確，準備附加到 Codex。", caution: "只附加課堂提供的 MorPage SOP，不附加私人資料。", notes: ["這是從聊天變成工作流程的關鍵。", "先讓學員認得桌面上的 SOP 檔案。", "提醒不要亂附加個人檔案。", "轉場到選取腳本。"] },
-      { kind: "action", theme: "light", label: "20 MorPage SOP 附加", eyebrow: "操作 13", title: "選取 MorPage SOP 腳本", img: "24_select_morpage_script_file.png", say: "MorPage SOP 是今天的網站操作路線圖。", doText: "在檔案視窗選取 MorPage 腳本。", success: "檔案附加到聊天框。", caution: "不要把客戶名單、訂單或個資檔案一起附上。", notes: ["明確說 MorPage SOP 附加的目的。", "SOP 讓 Codex 有固定步驟可跟。", "私人資料不要附上。", "轉場到送出檔案。"] },
-      { kind: "action", theme: "light", label: "21 檔案附加後送出", eyebrow: "操作 14", title: "讓 Codex 讀取 SOP", img: "25_file_attached_processing.png", say: "檔案附加後要送出，Codex 才能讀。", doText: "確認檔案在聊天框，按送出。", success: "Codex 開始讀取或整理腳本。", caution: "若沒看到檔名，先不要送出。", notes: ["這頁處理初學者常見錯誤：選了但沒附上。", "讓學員確認檔名。", "成功是 Codex 開始回應腳本內容。", "轉場到輸入任務指令。"] },
-      { kind: "prompt", theme: "dark", label: "22 輸入引導網站指令", eyebrow: "請學員貼上", title: "請引導我操作網站", code: "請根據這份 MorPage 操作腳本，引導我操作網站。\n請使用 Codex 內建瀏覽器開啟 MorPage 後台。\n所有儲存、刪除、匯出、正式金流、真實訂單處理前，都要先停下來讓我確認。", notes: ["這段指令是今天的安全護欄。", "一定要講出高風險操作前停下來。", "學員可以直接貼上，不需要自己改寫。", "轉場到內建瀏覽器。"] },
-      { kind: "action", theme: "light", label: "23 Codex 讀取腳本", eyebrow: "操作 15", title: "確認 Codex 已讀到腳本", img: "29_attached_file_full_access_prompt.png", say: "Codex 會先理解 SOP，再開始操作。", doText: "看 Codex 是否摘要或提出下一步。", success: "Codex 能說出 MorPage 操作方向。", caution: "如果它想做高風險操作，先停下來確認。", notes: ["讓學員知道 Codex 不是直接亂按。", "讀檔後會先理解任務。", "若要求權限，先看清楚。", "轉場到開啟內建瀏覽器。"] },
-      { kind: "action", theme: "light", label: "24 Codex 內建瀏覽器", eyebrow: "操作 16", title: "開啟 MorPage 後台", img: "30_morpage_open_in_codex_browser.png", say: "Codex 內建瀏覽器讓 AI 能看同一個網站畫面。", doText: "讓 Codex 開啟 MorPage 後台。", success: "MorPage 頁面出現在 Codex 右側或瀏覽器區。", caution: "登入帳密仍由本人輸入。", notes: ["強調這和一般 ChatGPT 最大差異之一。", "Codex 可以看流程，但帳密不給 AI。", "確認 MorPage 畫面已開。", "轉場到登入。"] },
-      { kind: "action", theme: "light", label: "25 MorPage 登入", eyebrow: "MorPage 01", title: "登入 MorPage 後台", img: "34_morpage_login_page.png", say: "這一步由學員本人操作。", doText: "輸入帳號、密碼與必要驗證。", success: "成功進入 MorPage 後台。", caution: "密碼、驗證碼、雙重驗證不可交給 AI。", notes: ["這頁要講慢一點。", "帳密屬於安全邊界。", "Codex 可以提醒流程，但不能代填密碼。", "轉場到選擇商店。"] },
-      { kind: "action", theme: "light", label: "26 選擇商店", eyebrow: "MorPage 02", title: "選擇今天使用的商店", img: "35_morpage_select_shop.png", say: "先確認進入的是課堂測試商店。", doText: "選擇指定商店。", success: "看到該商店的管理功能。", caution: "不要進到正式營運店做測試。", notes: ["確認商店名稱很重要。", "如果學員有多個商店，要選測試用。", "正式店不要做測試商品。", "轉場到商品管理。"] },
-      { kind: "action", theme: "light", label: "27 商品管理入口", eyebrow: "MorPage 03", title: "進入商品管理", img: "36_morpage_product_menu_or_list.png", say: "商品管理是建立銷售台的第一個入口。", doText: "在選單找到商品管理或商品列表。", success: "看到商品列表或新增商品按鈕。", caution: "不要刪除既有商品。", notes: ["讓學員先找到入口，不急著填資料。", "若畫面不同，以商品管理或列表為關鍵字。", "刪除功能完全不碰。", "轉場到新增商品。"] },
-      { kind: "prompt", theme: "dark", label: "28 測試商品資料", eyebrow: "請學員貼上", title: "建立一個測試商品", code: "商品編號：PHYS-001\n商品名稱：質感木紋桌面收納盒\n商品副標題：讓桌面更整齊，文具、小物與日常用品一盒收好\n商品說明：適合放置筆、便利貼、鑰匙、遙控器等桌面小物，木紋外觀簡約耐看，適合辦公桌、書桌與玄關使用。\n規格名稱：顏色\n規格選項：淺木色、深木色\n售價：680\n原價：880\n淺木色庫存：20\n深木色庫存：15\n請先填入資料，不要直接儲存。儲存前請摘要即將送出的欄位，等我確認。", notes: ["這段是商品上架練習資料。", "強調測試商品，不碰正式金流。", "最後兩句是安全重點：先填，不直接儲存。", "轉場到基本資料。"] },
-      { kind: "action", theme: "light", label: "29 商品基本資料", eyebrow: "MorPage 04", title: "填商品基本資料", img: "38_morpage_product_basic_fields.png", say: "先填最容易檢查的欄位。", doText: "填商品編號、名稱、副標題與基本分類欄位。", success: "商品基本資料與提示詞一致。", caution: "不要把正式品牌或客戶資料當測試資料。", notes: ["商品基本資料是第一個檢查點。", "讓 Codex 填資料後，學員自己看一次。", "若欄位名稱不同，以內容對應為主。", "轉場到圖片與說明。"] },
-      { kind: "action", theme: "light", label: "30 圖片與說明", eyebrow: "MorPage 05", title: "商品圖片與說明", img: "41_morpage_product_image_and_description.png", say: "圖片由學員手動上傳，AI 不代處理私人素材。", doText: "手動上傳測試圖片，填商品說明。", success: "圖片顯示正常，說明文字清楚。", caution: "不要上傳含個資、授權不明或正式素材。", notes: ["圖片是安全與授權敏感點。", "AI 可以提醒位置，但學員自己選檔。", "商品說明要能讓客戶看懂。", "轉場到規格欄位。"] },
-      { kind: "action", theme: "light", label: "31 規格設定", eyebrow: "MorPage 06", title: "建立規格名稱", img: "38b_morpage_product_spec_fields.png", say: "規格讓客戶能選擇商品變體。", doText: "輸入規格名稱：顏色。", success: "畫面出現顏色規格欄位。", caution: "規格名稱要短、清楚、客戶看得懂。", notes: ["先填規格名稱，不急著填價格。", "顏色是簡單好理解的範例。", "讓學員知道規格會影響庫存。", "轉場到規格選項。"] },
-      { kind: "action", theme: "light", label: "32 規格選項", eyebrow: "MorPage 07", title: "填規格選項", img: "38c_morpage_product_variation_option.png", say: "每個選項都要能對應到價格與庫存。", doText: "輸入淺木色、深木色。", success: "兩個選項都出現在規格清單。", caution: "不要建立過多選項，初學練習先簡單。", notes: ["規格選項要和前面商品資料一致。", "若系統要求新增一列，依畫面操作。", "確認兩個選項都存在。", "轉場到價格庫存。"] },
-      { kind: "action", theme: "light", label: "33 價格庫存", eyebrow: "MorPage 08", title: "填價格與庫存", img: "39_40_morpage_price_and_stock_fields.png", say: "價格與庫存是儲存前一定要核對的欄位。", doText: "填售價 680、原價 880、庫存 20 與 15。", success: "每個規格都有正確價格與庫存。", caution: "正式商品價格不可由 AI 自動決定。", notes: ["價格是高風險欄位之一。", "測試資料可以跟做，正式商品要人工確認。", "提醒不要少填某個規格庫存。", "轉場到儲存前確認。"] },
-      { kind: "action", theme: "light", label: "34 儲存前人工確認", eyebrow: "MorPage 09", title: "儲存前請 Codex 摘要", img: "42_morpage_save_button_with_codex_confirmation.png", say: "按儲存前一定要停下來。", doText: "請 Codex 摘要即將送出的欄位，再由學員確認。", success: "摘要內容與畫面欄位一致。", caution: "未確認前不要按儲存。", safety: "高風險操作三原則：先停、先看、先確認。", notes: ["這是整堂課最重要的安全動作。", "讓學員養成送出前摘要。", "老師可示範如何讀摘要。", "轉場到列表驗證。"] },
-      { kind: "action", theme: "light", label: "35 儲存後列表驗證", eyebrow: "MorPage 10", title: "回列表驗證", img: "45_morpage_product_list_verify.png", say: "完成不是按儲存，而是儲存後能驗證。", doText: "回到商品列表，搜尋或查看測試商品。", success: "看到商品名稱、編號、價格或狀態正確。", caution: "如果找不到商品，先檢查是否真的儲存成功。", notes: ["把驗證當成工作流程的一部分。", "不是做完就關掉。", "列表上能看到才算完成。", "轉場到銷售頁管理入口。"] },
-      { kind: "action", theme: "light", label: "36 銷售頁管理入口", eyebrow: "MorPage 11", title: "找到銷售頁管理", img: "46_morpage_sales_page_management.png", say: "銷售台不只商品，還要知道銷售頁入口。", doText: "在後台找到銷售頁管理。", success: "看到銷售頁列表或管理入口。", caution: "今天只看入口，不填銷售頁表單。", notes: ["這頁延伸銷售台概念。", "不進入複雜銷售頁表單。", "讓學員知道下一步在哪裡。", "轉場到建立入口。"] },
-      { kind: "action", theme: "light", label: "37 建立銷售頁入口", eyebrow: "MorPage 12", title: "看到建立銷售頁按鈕", img: "47_morpage_sales_page_create_button.png", say: "確認入口存在即可。", doText: "找到新增或建立銷售頁按鈕。", success: "知道未來要從哪裡建立銷售頁。", caution: "不使用銷售頁表單截圖 48，不在本堂細填。", notes: ["這頁明確說今天跳過表單。", "避免課程時間被新流程拉走。", "把重點拉回商品上架與驗證。", "轉場到檢查清單。"] },
-      { kind: "check", theme: "dark", label: "38 MorPage 銷售台檢查清單", eyebrow: "驗證清單", title: "商品存在，不代表銷售台已準備好。", items: ["商品是否已建立", "商品名稱與編號是否正確", "圖片是否需要人工確認", "商品說明是否清楚", "規格是否完整", "價格與庫存是否正確", "是否需要建立銷售頁", "哪些地方上架前一定要人工確認"], notes: ["這頁把操作轉成檢查表。", "讓學員知道銷售台是一組流程。", "每項都可以請 Codex 協助檢查。", "轉場到 AI 可以做什麼。"] },
-      { kind: "check", theme: "light", label: "39 AI 可以協助", eyebrow: "能力邊界", title: "AI 最適合協助流程，不是替你亂按。", items: ["開頁面與找入口", "引導流程與填測試資料", "檢查欄位是否漏填", "摘要即將送出的內容", "儲存後讀回驗證", "整理下一次可重複使用的 SOP"], notes: ["讓學員看到 AI 的實用價值。", "重點是會停、會問、會驗證。", "AI 不是拿來亂點網站。", "轉場到不能交給 AI 的事。"] },
-      { kind: "check", theme: "light", label: "40 一定要人工確認", eyebrow: "安全邊界", title: "這些事，不交給 AI 自動處理。", items: ["密碼與驗證碼", "正式金流設定", "正式刪除與正式匯出", "真實訂單處理", "客戶個資下載", "法律、稅務與合約判斷", "未確認的對外公開內容"], footer: "高風險操作三原則：先停、先看、先確認。", notes: ["這頁需要重複安全邊界。", "正式金流、刪除、匯出都不能放行。", "客戶個資要特別提醒。", "轉場到 Agent 工作流。"] },
-      { kind: "concept", theme: "dark", label: "41 專屬 AI Agent 工作流", eyebrow: "第二大段", title: "不是開發 Agent，而是設計你的任務流程。", lead: "把工作拆成輸入、SOP、AI 可以做的事、AI 不能做的事、人工確認點與最後輸出。", points: [["商品上架 Agent", "協助整理商品素材、填測試欄位、儲存前摘要。"], ["銷售頁檢查 Agent", "依清單檢查文字、圖片、價格、CTA。"], ["客戶回覆 Agent", "整理訊息、草擬回覆，但不自動送出。"]], notes: ["把焦點從工具轉成流程設計。", "學員不用會開發。", "只要能描述任務，AI 就比較能幫忙。", "轉場到更多範例。"] },
-      { kind: "concept", theme: "light", label: "42 Agent 範例方向", eyebrow: "可選題目", title: "從你每天重複做的工作開始。", lead: "不要一開始就做很大的全自動系統，先選一個小而常發生的流程。", points: [["社群內容 Agent", "把商品賣點轉成貼文、短影音腳本與標題。"], ["課程招生 Agent", "整理課程亮點、FAQ、私訊回覆草稿。"], ["行政整理 Agent", "整理文件、會議記錄、待辦清單。"], ["收支整理輔助 Agent", "協助分類資料，但不做稅務判斷。"]], notes: ["鼓勵學員選小流程。", "每個範例都要有人工確認。", "不要一開始追求全自動。", "轉場到模板。"] },
-      { kind: "template", theme: "light", label: "43 Agent 工作流模板", eyebrow: "學員填寫", title: "我的專屬 AI Agent 工作流", code: "# Agent 名稱\n\n## 它主要幫我完成什麼任務\n\n## 我會提供哪些資料\n\n## 它要照什麼 SOP 做事\n\n## 它可以幫我做什麼\n\n## 它不能幫我做什麼\n\n## 哪些地方一定要人工確認\n\n## 最後輸出格式", notes: ["這頁就是學員要填的模板。", "可以先填一個最小版本。", "一定要填不能做什麼與人工確認。", "轉場到實作時間。"] },
-      { kind: "check", theme: "dark", label: "44 學員實作時間與常見卡關", eyebrow: "現場操作", title: "卡住時，先回到流程。", items: ["找不到檔案：回到工作區或下載資料夾", "Codex 沒讀到 SOP：確認檔案有附加並送出", "MorPage 畫面不同：找同義入口，例如商品管理、商品列表", "不確定能不能按：先停下來問老師", "儲存後找不到：回列表搜尋商品名稱或編號"], notes: ["這頁是助教巡場時的共同語言。", "把卡關分成檔案、SOP、頁面、權限、驗證。", "不確定就停，這是正確行為。", "轉場到成果檢查表。"] },
-      { kind: "check", theme: "light", label: "45 今日成果檢查表", eyebrow: "收尾", title: "今天完成什麼？", items: ["能登入 Codex", "能說出 ChatGPT 與 Codex 差異", "能附加 MorPage SOP 腳本", "能讓 Codex 引導操作 MorPage", "完成測試商品建立流程", "知道哪些操作不能交給 AI", "完成一份自己的 Agent 工作流草稿"], footer: "回家作業：選一個自己的重複工作，把它寫成 Agent 工作流模板。", notes: ["用檢查表收斂成果。", "提醒大家今天已經完成一個流程。", "回家作業要小而具體。", "最後再次提醒安全三原則。"] }
-    ];
+      {
+            "kind": "hero",
+            "theme": "light center",
+            "label": "01 封面",
+            "eyebrow": "Codex AI Agent 實戰課",
+            "title": "AI 開始幫你接手流程",
+            "lead": "Agent 不是更會聊天的 AI，而是開始會看資料、用工具、照流程完成任務的 AI 工作助理。",
+            "cards": [
+                  [
+                        "先丟資料",
+                        "檔案或資料夾"
+                  ],
+                  [
+                        "再下指令",
+                        "貼上提示詞"
+                  ],
+                  [
+                        "先看結果",
+                        "報告與清單"
+                  ],
+                  [
+                        "再確認",
+                        "高風險先停"
+                  ]
+            ],
+            "notes": [
+                  "這堂課的主軸不是學名詞，而是學會交代工作。",
+                  "先把學員安定下來：不用會寫程式。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "02 這堂課給誰",
+            "eyebrow": "學員定位",
+            "title": "以前問 AI，現在交辦 AI。",
+            "lead": "上一堂課教大家 AI 可以做圖、做文案、做影片；這堂課要往前一步：讓 AI 幫你接手電腦工作流程。",
+            "points": [
+                  [
+                        "上一堂",
+                        "AI 產出內容。"
+                  ],
+                  [
+                        "這一堂",
+                        "AI 接手流程。"
+                  ],
+                  [
+                        "關鍵",
+                        "資料給對，指令講清楚。"
+                  ]
+            ],
+            "notes": [
+                  "強調課堂資料是假的。",
+                  "不要讓學員一開始就用自己的資料。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "dark center",
+            "label": "03 今天只記兩件事",
+            "eyebrow": "核心口訣",
+            "title": "Agent 就是會接手流程的 AI 工作助理。",
+            "lead": "你給它一個目標，它會看資料、用工具、照流程做事，最後把結果回報給你。",
+            "points": [
+                  [
+                        "目標",
+                        "我要完成什麼。"
+                  ],
+                  [
+                        "資料",
+                        "Excel、Word、資料夾、網站。"
+                  ],
+                  [
+                        "工具",
+                        "Office、Chrome、檔案系統。"
+                  ]
+            ],
+            "notes": [
+                  "這頁要反覆講。",
+                  "學生會卡在到底丟什麼，這頁是解法。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "04 Agent 四件事",
+            "eyebrow": "知識點",
+            "title": "一個 Agent 任務，要講清楚五件事。",
+            "rows": [
+                  [
+                        "目標",
+                        "你要它完成什麼，不要只說幫我弄一下。"
+                  ],
+                  [
+                        "資料",
+                        "要丟哪個檔案、哪個資料夾，或不用丟檔案。"
+                  ],
+                  [
+                        "工具",
+                        "要它用 Excel、Word、PPT、Chrome，還是檔案總管。"
+                  ],
+                  [
+                        "回報",
+                        "完成後要給你表格、摘要、清單或建議。"
+                  ],
+                  [
+                        "邊界",
+                        "刪除、覆蓋、送出、付款、C 槽真資料都要先停。"
+                  ]
+            ],
+            "notes": [
+                  "這張是全課知識框架。"
+            ]
+      },
+      {
+            "kind": "flow",
+            "theme": "dark",
+            "label": "05 Agent 工作流公式",
+            "eyebrow": "套用上一堂課的 SOP 思維",
+            "title": "把提示詞升級成工作流。",
+            "steps": [
+                  [
+                        "01",
+                        "輸入",
+                        "給檔案、資料夾、網站或任務。"
+                  ],
+                  [
+                        "02",
+                        "處理",
+                        "請 AI 盤點、分類、分析、查證。"
+                  ],
+                  [
+                        "03",
+                        "輸出",
+                        "要求表格、摘要、簡報大綱。"
+                  ],
+                  [
+                        "04",
+                        "檢查",
+                        "要求 AI 回報異常與風險。"
+                  ],
+                  [
+                        "05",
+                        "確認",
+                        "高風險動作由人決定。"
+                  ]
+            ],
+            "footer": "不是一句神奇提示詞，而是一套可重複的工作流程。",
+            "notes": [
+                  "上一堂課有提示詞公式，這堂課升級成流程公式。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "06 什麼要丟給 Codex",
+            "eyebrow": "最重要的一張表",
+            "title": "看檔名就知道要不要丟。",
+            "rows": [
+                  [
+                        "丟給Codex_*.xlsx",
+                        "Excel 練習檔，請上傳或附加給 Codex。"
+                  ],
+                  [
+                        "丟給Codex_*.docx",
+                        "Word 練習檔，請上傳或附加給 Codex。"
+                  ],
+                  [
+                        "不用丟_*.pptx",
+                        "先不用上傳，等做到 PPT 才打開。"
+                  ],
+                  [
+                        "不用丟給Codex_*.txt",
+                        "只是提醒文字，不要上傳。"
+                  ],
+                  [
+                        "資料夾練習",
+                        "給 Codex 資料夾路徑，請它先盤點。"
+                  ],
+                  [
+                        "C 槽練習",
+                        "只用假資料夾，不碰真 C 槽。"
+                  ]
+            ],
+            "notes": [
+                  "直接把學生的疑惑放到台上解掉。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "07 Codex 下載",
+            "eyebrow": "操作 01",
+            "title": "Codex 下載",
+            "img": "01_codex_website_link.png",
+            "say": "先確認下載來源。",
+            "doText": "打開 Codex 官方下載頁。",
+            "success": "看到可下載的安裝檔。",
+            "caution": "不要下載來路不明的安裝檔。",
+            "notes": [
+                  "先讓學員確認網址與下載來源。",
+                  "不要急著執行任何不明檔案。",
+                  "成功標準是看到下載入口。",
+                  "轉場到選擇下載版本。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "08 下載選擇",
+            "eyebrow": "操作 02",
+            "title": "選擇 Windows 下載",
+            "img": "02_download_choice.png",
+            "say": "Windows 學員選 Windows 安裝檔。",
+            "doText": "依自己的作業系統選擇下載。",
+            "success": "下載列或資料夾出現安裝檔。",
+            "caution": "Mac 與 Windows 畫面可能不同，跟自己的電腦選。",
+            "notes": [
+                  "提醒學員不要跟旁邊同學作業系統混淆。",
+                  "老師可口頭補充 Mac 版本差異。",
+                  "這頁只求成功下載。",
+                  "轉場到執行安裝檔。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "09 執行安裝檔",
+            "eyebrow": "操作 03",
+            "title": "下載完成，點選 EXE",
+            "img": "03_download_complete_click_exe.png",
+            "say": "下載完成後才點安裝檔。",
+            "doText": "在瀏覽器下載列或下載資料夾點開 EXE。",
+            "success": "看到 Windows 安裝或儲存提示。",
+            "caution": "若瀏覽器擋下，先看清楚檔名與來源。",
+            "notes": [
+                  "這是很多初學者會卡住的地方。",
+                  "提醒學員可以從下載資料夾找。",
+                  "不要同時重複下載多份。",
+                  "轉場到儲存與安裝。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "10 儲存與安裝",
+            "eyebrow": "操作 04",
+            "title": "點選存檔，開始安裝",
+            "img": "04_save_installer.png",
+            "say": "Windows 可能會要求確認存檔。",
+            "doText": "按下存檔，接著依畫面啟動安裝。",
+            "success": "看到安裝進度或 Codex 啟動畫面。",
+            "caution": "若有系統安全提示，先確認名稱再繼續。",
+            "notes": [
+                  "老師可以巡場協助 Windows 安全提示。",
+                  "這頁不用講太多系統設定。",
+                  "重點是讓學員完成安裝。",
+                  "轉場到安裝中畫面。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "11 安裝進行中",
+            "eyebrow": "操作 05",
+            "title": "等待 Codex 安裝完成",
+            "img": "06_installing.png",
+            "say": "安裝時不要急著重複點。",
+            "doText": "等待安裝進度跑完。",
+            "success": "Codex 開啟或出現登入頁。",
+            "caution": "如果卡太久，再請助教協助檢查。",
+            "notes": [
+                  "讓學員知道等待是正常的。",
+                  "避免有人重複開啟多個安裝程式。",
+                  "成功標準是進入 Codex。",
+                  "轉場到 OAuth 登入。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "12 ChatGPT OAuth 登入",
+            "eyebrow": "操作 06",
+            "title": "用 ChatGPT / OpenAI 帳號登入",
+            "img": "07_codex_login_page.png",
+            "say": "Codex 使用 ChatGPT / OpenAI 帳號登入。",
+            "doText": "點登入，完成 OAuth。",
+            "success": "看到 Codex 主畫面或登入成功頁。",
+            "caution": "密碼與驗證碼由本人輸入，不交給 AI。",
+            "notes": [
+                  "強調帳密由本人輸入。",
+                  "OAuth 是授權登入，不是把密碼給 Codex。",
+                  "若有驗證碼，讓學員自己處理。",
+                  "轉場到登入成功。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "13 登入成功",
+            "eyebrow": "操作 07",
+            "title": "確認登入完成",
+            "img": "10_login_success.png",
+            "say": "登入後回到 Codex。",
+            "doText": "確認畫面顯示登入成功或可進入主畫面。",
+            "success": "能開始輸入第一句指令。",
+            "caution": "不要把登入畫面截圖分享給陌生人。",
+            "notes": [
+                  "這裡給學員一個小休息點。",
+                  "確認大家都已進入 Codex。",
+                  "下一步才開始說主畫面。",
+                  "轉場到 Codex 主畫面。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "14 Codex 主畫面",
+            "eyebrow": "操作 08",
+            "title": "認識任務開始的位置",
+            "img": "11_codex_main_clean.png",
+            "say": "這裡是任務開始的地方。",
+            "doText": "輸入第一句測試指令。",
+            "success": "Codex 能用繁體中文回覆。",
+            "caution": "新聊天、專案、檔案位置要分清楚。",
+            "notes": [
+                  "把主畫面當成工作桌。",
+                  "不要急著介紹所有功能。",
+                  "先讓學員完成第一句測試。",
+                  "轉場到左側選單。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "15 左側選單",
+            "eyebrow": "操作 09",
+            "title": "新聊天、搜尋、外掛、專案",
+            "img": "14_left_sidebar.png",
+            "say": "左側是管理工作的入口。",
+            "doText": "看見新聊天、搜尋、外掛程式、自動化、專案、設定。",
+            "success": "知道要開新任務時從哪裡開始。",
+            "caution": "今天不深入自動化與追求目標。",
+            "notes": [
+                  "只介紹和今天相關的入口。",
+                  "讓學員知道不是每個功能都要現場學。",
+                  "專案與檔案位置後面會用到。",
+                  "轉場到模型與速度。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "16 模型與智慧功能",
+            "eyebrow": "操作 10",
+            "title": "模型、智慧功能與速度",
+            "img": "15_model_reasoning_speed_menu.png",
+            "say": "不同任務需要不同思考強度。",
+            "doText": "找到模型、智慧功能低/中/高/超高與快速模式。",
+            "success": "知道高智慧較慢，快速模式較快。",
+            "caution": "現場跟做以穩定與清楚為主，不追求最炫設定。",
+            "notes": [
+                  "用簡單比喻：思考越深，速度可能越慢。",
+                  "初學者不用糾結每個模型差異。",
+                  "建議今天用穩定設定。",
+                  "轉場到權限。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "17 權限選擇",
+            "eyebrow": "操作 11",
+            "title": "權限越高，越需要確認",
+            "img": "17_permission_menu.png",
+            "say": "權限控制 Codex 能做多少事。",
+            "doText": "理解預設權限、自動審核、完整存取權的差異。",
+            "success": "知道哪些操作要停下來確認。",
+            "caution": "正式金流、刪除、匯出、真實訂單都不能自動放行。",
+            "safety": "高風險操作三原則：先停、先看、先確認。",
+            "notes": [
+                  "這頁是安全核心。",
+                  "權限不是越高越好，而是越要看清楚。",
+                  "請學員一起念安全三原則。",
+                  "轉場到追求目標限制。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "18 追求目標不列入",
+            "eyebrow": "穩定性提醒",
+            "title": "追求目標目前不穩定",
+            "img": "33_goal_toggle_unavailable_or_unstable.png",
+            "say": "這個功能目前不列入正式操作教學。",
+            "doText": "今天改用聊天指令，把完整任務寫清楚。",
+            "success": "知道不用在現場設定追求目標。",
+            "caution": "若畫面出現「無法設定目標」，不要卡在這裡。",
+            "safety": "追求目標目前不穩定，不列入正式操作教學。",
+            "notes": [
+                  "把可能卡關的點先排除。",
+                  "不是學員做錯，是功能不穩定。",
+                  "我們用更穩的聊天指令完成任務。",
+                  "轉場到附加檔案。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "19 AI 名詞地圖",
+            "eyebrow": "先懂名詞，不背名詞",
+            "title": "這堂課會碰到六個基礎概念。",
+            "rows": [
+                  [
+                        "Agent",
+                        "像一台會跑任務的車，會照你的方向使用工具完成流程。"
+                  ],
+                  [
+                        "LLM",
+                        "像不同型號的引擎，決定 AI 理解、推理、生成的能力。"
+                  ],
+                  [
+                        "Token",
+                        "像油箱容量或這趟能載多少資料；資料太長，就要分段或摘要。"
+                  ],
+                  [
+                        "Tool",
+                        "像車子的輪胎、方向盤、雨刷，讓 Agent 可以真的操作檔案與軟體。"
+                  ],
+                  [
+                        "Skill / SKILL.md",
+                        "像駕駛手冊或路線 SOP，讓 Codex 知道某類任務要怎麼跑。"
+                  ],
+                  [
+                        "Markdown / HTML",
+                        "Markdown 是好寫的文字格式；HTML 是可以放到網頁上的講義格式。"
+                  ]
+            ],
+            "notes": [
+                  "這頁不要講太技術，用車子比喻。",
+                  "學生只要知道：車子、引擎、油箱、工具、駕駛手冊、講義格式。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "dark",
+            "label": "20 LLM 與 Token",
+            "eyebrow": "引擎與油箱",
+            "title": "LLM 像不同型號的引擎，Token 像油箱容量。",
+            "lead": "不同 LLM 就像不同型號的引擎，有的適合長距離、有的適合精細工作；Token 則像這趟車能載多少資料。資料太多，不是 AI 壞掉，而是要分批跑。",
+            "points": [
+                  [
+                        "LLM",
+                        "決定理解、推理、生成的能力，就像車子的引擎。"
+                  ],
+                  [
+                        "Token",
+                        "不是錢，是容量；越長的文件越吃容量。"
+                  ],
+                  [
+                        "教學提醒",
+                        "資料很多時，先叫 AI 盤點與摘要，不要一次要它做完全部。"
+                  ]
+            ],
+            "notes": [
+                  "用油箱容量比喻 token。",
+                  "這能解釋為什麼長逐字稿、很多 Excel 檔要分步做。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "21 Agent 與 Skill",
+            "eyebrow": "從聊天到做事",
+            "title": "Agent 是整台車：有引擎，也有工具、路線和煞車。",
+            "lead": "只會回答問題的是聊天 AI；Agent 像一台完整的車，裝上 LLM 這顆引擎，再加上工具、流程、煞車，才可以把任務跑完。",
+            "points": [
+                  [
+                        "工具",
+                        "輪胎與方向盤：Excel、Word、PPT、Chrome、檔案總管。"
+                  ],
+                  [
+                        "流程",
+                        "導航路線：先盤點、再分析、輸出作品、請人確認。"
+                  ],
+                  [
+                        "Skill",
+                        "駕駛手冊：告訴 Codex 遇到某類工作時要照什麼規則做。"
+                  ]
+            ],
+            "notes": [
+                  "把 Skill 講成駕駛手冊或 SOP，不要講成程式。",
+                  "提 SKILL.md 時說：md 只是文字格式，不是神秘檔案。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "22 Markdown 與 HTML",
+            "eyebrow": "AI 最常用的兩種文字格式",
+            "title": "Markdown 用來寫清楚，HTML 用來放上網頁。",
+            "rows": [
+                  [
+                        "Markdown / MD",
+                        "像乾淨的筆記格式，標題、條列、表格都很清楚，AI 很容易讀。"
+                  ],
+                  [
+                        "SKILL.md",
+                        "副檔名是 md，內容通常是給 AI 看的任務規則或操作 SOP。"
+                  ],
+                  [
+                        "HTML",
+                        "網頁格式，今天台上投影片和課堂流程頁就是 HTML。"
+                  ],
+                  [
+                        "為什麼要懂",
+                        "你知道格式差異，就比較知道要丟檔案、貼文字，還是開網頁。"
+                  ]
+            ],
+            "notes": [
+                  "把 MD 講成筆記，把 HTML 講成網頁。",
+                  "不要教語法，點到為止。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "23 課堂素材包",
+            "eyebrow": "開始實作",
+            "title": "今天每個練習，都是 AI Agent 駕訓班的一站。",
+            "lead": "請打開桌面：Codex課堂實作素材包。先開「第00步_先開我_AI Agent駕訓班.html」，每一站都會告訴你丟什麼、貼什麼、做到什麼算完成。",
+            "points": [
+                  [
+                        "Agent",
+                        "整台車，負責把任務跑完。"
+                  ],
+                  [
+                        "LLM",
+                        "引擎，決定理解與推理能力。"
+                  ],
+                  [
+                        "安全邊界",
+                        "煞車，高風險先停。"
+                  ]
+            ],
+            "notes": [
+                  "現場請大家確認桌面有素材包。",
+                  "用駕訓班比喻帶學生進入七個練習。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "24 七個練習總表",
+            "eyebrow": "先丟，再貼",
+            "title": "每一題都有作品，不只是操作。",
+            "rows": [
+                  [
+                        "練習一",
+                        "作品：整理建議報告。能力：建立工作秩序。"
+                  ],
+                  [
+                        "練習二",
+                        "作品：主管會報摘要。能力：把資料變決策。"
+                  ],
+                  [
+                        "練習三",
+                        "作品：會計複核清單。能力：找風險疑點。"
+                  ],
+                  [
+                        "練習四",
+                        "作品：行政待辦名單。能力：把名單變行動。"
+                  ],
+                  [
+                        "練習五",
+                        "作品：Word 摘要 + PPT 大綱。能力：跨 Office 工作流。"
+                  ],
+                  [
+                        "練習六",
+                        "作品：問題排查清單。能力：讓 Agent 診斷電腦問題。"
+                  ],
+                  [
+                        "練習七",
+                        "作品：清理建議表。能力：安全盤點，不亂刪。"
+                  ]
+            ],
+            "notes": [
+                  "這張要讓學員拍照也可以。"
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "25 今天會看到的畫面",
+            "eyebrow": "畫面確認",
+            "title": "不用每個人的結果一樣，重點是會問、會看、會煞車。",
+            "rows": [
+                  [
+                        "Codex 安裝與登入",
+                        "前面教案已經有畫面，這段照老師投影片，不需要重新準備。"
+                  ],
+                  [
+                        "素材包與任務卡",
+                        "要會打開第 00 步入口、七站資料夾、第 06 站任務卡、第 07 站任務卡。"
+                  ],
+                  [
+                        "電腦故障排查",
+                        "每台電腦狀況不同，結果不用一樣；重點是把症狀講清楚，讓 Agent 問問題、排查、給低風險步驟。"
+                  ],
+                  [
+                        "C 槽安全清理",
+                        "每台電腦檔案不同，結果不用一樣；課堂只用假資料練習盤點，不直接刪檔。"
+                  ],
+                  [
+                        "安全煞車",
+                        "刪除、下載、關防毒、改系統設定，都要先停下來問人。"
+                  ]
+            ],
+            "notes": [
+                  "這張給學生看，避免以為要跟老師截圖或結果完全相同。"
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "26 素材包根目錄",
+            "eyebrow": "素材包畫面",
+            "title": "先看到第 00 步和七個站點。",
+            "img": "course_pack_00_root.png",
+            "say": "這是學生桌面素材包打開後的樣子。",
+            "doText": "先確認自己有第 00 步入口和 01 到 07 站資料夾。",
+            "success": "看得到第 00 步與七站資料夾。",
+            "caution": "不要從老師補充資料開始操作。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "27 AI Agent 駕訓班入口",
+            "eyebrow": "素材包畫面",
+            "title": "第 00 步先開這一頁。",
+            "img": "course_pack_00_dashboard.png",
+            "say": "這頁是整堂課的導航，不是普通說明書。",
+            "doText": "先看 Agent、LLM、Token、Skill、安全邊界，再進入各站。",
+            "success": "知道先丟資料、再貼提示詞、高風險先煞車。",
+            "caution": "不用背名詞，重點是知道怎麼交辦。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "28 第 01 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "整理車庫：混亂資料夾。",
+            "img": "course_pack_01_folder.png",
+            "say": "第一站練習電腦資料整理。",
+            "doText": "給 Codex 整個資料夾路徑，先盤點，不要刪檔。",
+            "success": "產出整理建議報告。",
+            "caution": "不確定的檔案先放待確認。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "29 第 02 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "會報導航：Excel 銷售月報。",
+            "img": "course_pack_02_folder.png",
+            "say": "第二站練習把 Excel 數字變成會報摘要。",
+            "doText": "丟 Excel 練習檔，再貼提示詞。",
+            "success": "產出主管會報摘要。",
+            "caution": "不要只叫 AI 整理表格，要指定主管要看的重點。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "30 第 03 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "風險煞車：Excel 會計複核。",
+            "img": "course_pack_03_folder.png",
+            "say": "第三站練習讓 Agent 找會計疑點。",
+            "doText": "丟支出與收據練習檔，請它列疑似重複、缺資料、異常。",
+            "success": "產出會計複核清單。",
+            "caution": "疑點不是結論，正式資料要人工確認。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "31 第 04 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "路線規劃：學員名單。",
+            "img": "course_pack_04_folder.png",
+            "say": "第四站練習把名單變成行政待辦。",
+            "doText": "丟學員名單，請 Agent 找未繳費、未出席、未交作業。",
+            "success": "產出行政待辦名單。",
+            "caution": "不要只叫 AI 看名單，要叫它列下一步。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "32 第 05 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "連續駕駛：Word 與 PPT。",
+            "img": "course_pack_05_folder.png",
+            "say": "第五站練習跨 Office 工作流。",
+            "doText": "先丟 Word 練習檔，請 Agent 產出主管摘要與 PPT 大綱。",
+            "success": "產出一頁摘要與 6 頁簡報大綱。",
+            "caution": "PPT 不要塞滿字，每頁只放一個主題。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "33 第 06 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "故障排查：電腦問題診斷。",
+            "img": "course_pack_06_folder.png",
+            "say": "第六站練習電腦變慢、過熱、當機時怎麼請 Agent 排查並解決。",
+            "doText": "不用先丟檔案，先描述症狀、時間、錯誤訊息。",
+            "success": "產出問題排查清單與低風險解決步驟。",
+            "caution": "不要一開始就叫 AI 刪檔、下載工具、關防毒或改系統設定。",
+            "notes": []
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "34 第 07 站資料夾",
+            "eyebrow": "素材包畫面",
+            "title": "安全煞車：C 槽假資料。",
+            "img": "course_pack_07_folder.png",
+            "say": "第七站練習讓 Agent 做 C 槽清理前的安全盤點。",
+            "doText": "只給假資料夾路徑，不碰真實 C 槽。",
+            "success": "產出清理建議表。",
+            "caution": "AI 只做建議，不直接刪。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "35 練習一 檔案整理",
+            "eyebrow": "練習一",
+            "title": "知識點：整理資料不是清垃圾，是建立工作秩序。",
+            "lead": "台上先講：AI 整理電腦資料要分三步，先盤點、再分類、最後才確認動作。不能一開始就叫它刪。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 做內容；這堂 AI 整理內容。"
+                  ],
+                  [
+                        "作品",
+                        "整理建議報告。"
+                  ],
+                  [
+                        "避坑",
+                        "不要一開始叫 AI 刪檔。"
+                  ]
+            ],
+            "notes": [
+                  "老師講法：今天不是教你按資料夾，而是教你把整理規則講清楚。",
+                  "示範複製資料夾路徑。"
+            ]
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "36 練習一 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "整理資料夾提示詞",
+            "code": "請幫我整理這個資料夾。先不要移動或刪除任何檔案。請先列出檔案類型、可能用途、建議分類資料夾，並告訴我哪些檔案需要人工確認。",
+            "notes": []
+      },
+      {
+            "kind": "check",
+            "theme": "dark",
+            "label": "37 練習一 驗收",
+            "eyebrow": "完成標準",
+            "title": "看見報告，才算完成。",
+            "items": [
+                  "Codex 先列出檔案類型",
+                  "Codex 說明哪些檔案需要人工確認",
+                  "沒有刪除任何檔案",
+                  "老師確認後才移動或分類"
+            ],
+            "footer": "不確定，就放待確認。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "38 練習二 Excel 會報",
+            "eyebrow": "練習二",
+            "title": "知識點：Excel 不是只有表格，是會報語言。",
+            "lead": "台上先講：主管不想看一整張明細，主管要看總數、排名、異常、下一步。AI 的價值是把資料轉成決策摘要。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 做海報文案；這堂 AI 做經營摘要。"
+                  ],
+                  [
+                        "作品",
+                        "主管會報摘要。"
+                  ],
+                  [
+                        "避坑",
+                        "沒指定讀者，AI 只會整理表格。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "39 練習二 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "Excel 會報提示詞",
+            "code": "請幫我分析這份 Excel 銷售月報，但不要修改原始工作表。請另外建立或規劃一個「會報摘要」，包含本月總營收、總銷售數量、前 5 名商品、表現最好的通路、需要注意的異常、給主管看的 5 句白話摘要。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "40 練習三 Excel 會計",
+            "eyebrow": "練習三",
+            "title": "知識點：會計情境裡，AI 是複核助手，不是會計師。",
+            "lead": "台上先講：AI 可以幫你找疑似重複、缺發票、金額異常，但正式申報、稅務判斷、付款決定，一定是人確認。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 幫你產出；這堂 AI 幫你檢查。"
+                  ],
+                  [
+                        "作品",
+                        "會計複核清單。"
+                  ],
+                  [
+                        "避坑",
+                        "疑點不是結論，正式判斷仍由人做。"
+                  ]
+            ],
+            "notes": [
+                  "強調不是正式會計判斷。"
+            ]
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "41 練習三 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "Excel 會計提示詞",
+            "code": "請幫我檢查這份支出表，但不要替我做正式會計判斷。請找出疑似重複付款、金額異常、缺少發票號碼、用途不清楚、尚未付款，並用表格列出原始列號、問題類型、原因、建議我怎麼確認。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "42 練習四 學員名單",
+            "eyebrow": "練習四",
+            "title": "知識點：名單管理不是看名單，是找下一步。",
+            "lead": "台上先講：行政工作最常卡在資料很多，但不知道今天要先處理誰。AI 可以把名單變成待辦清單。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 產生內容；這堂 AI 產生行動清單。"
+                  ],
+                  [
+                        "作品",
+                        "行政待辦名單。"
+                  ],
+                  [
+                        "避坑",
+                        "不要只叫 AI 看名單，要叫它列下一步。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "43 練習四 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "學員名單提示詞",
+            "code": "請幫我整理這份學員名單。請列出未繳費、未交作業、請假、需要協助的學員，並建議分組與課後追蹤清單。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "44 練習五 Word PPT",
+            "eyebrow": "練習五",
+            "title": "知識點：Office 串起來，才是完整工作流。",
+            "lead": "台上先講：Excel 是數字，Word 是說明，PPT 是上台報告。AI 最好用的地方，是把同一份資料轉成不同輸出。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 做單張圖；這堂 AI 做完整簡報流程。"
+                  ],
+                  [
+                        "作品",
+                        "Word 摘要 + PPT 大綱。"
+                  ],
+                  [
+                        "避坑",
+                        "PPT 不要塞滿字，先做摘要。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "45 練習五 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "Word 與 PPT 提示詞",
+            "code": "請根據剛剛 Excel 的會報摘要，幫我寫一份一頁 Word 主管摘要。接著請把這份主管摘要規劃成 6 頁 PPT，每頁最多 3 個重點，先給我大綱，不要做複雜設計。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "46 練習六 故障排查",
+            "eyebrow": "練習六",
+            "title": "知識點：電腦出問題時，先請 Agent 排查，不要亂按。",
+            "lead": "台上先講：這站教學生電腦變慢、過熱、當機、找不到檔案、Office 打不開時，怎麼把症狀講清楚，讓 Agent 先排查原因，再在低風險範圍內一步步解決。",
+            "points": [
+                  [
+                        "情境",
+                        "電腦變慢、過熱、當機、檔案找不到、Office 開不了、瀏覽器異常。"
+                  ],
+                  [
+                        "作品",
+                        "問題排查清單 + 低風險解決步驟。"
+                  ],
+                  [
+                        "避坑",
+                        "不要一開始就叫 AI 刪檔、下載工具、關防毒或改系統設定。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "47 練習六 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "電腦問題排查與解決提示詞",
+            "code": "我的電腦現在遇到一個問題，可能是變慢、過熱、當機、檔案找不到、Office 打不開或 Chrome 異常。請先不要刪除、下載、關閉防毒或修改系統設定。請先問我 3 到 5 個必要問題，確認症狀、發生時間、影響範圍、最近是否安裝新軟體或移動檔案。接著請列出可能原因，並依照「低風險可先做」「需要我確認」「不要自己做」三類給我解決步驟。每一步請說明目的、怎麼做、做完要觀察什麼。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "dark",
+            "label": "48 手機連 Codex",
+            "eyebrow": "延伸示範",
+            "title": "手機是遙控器，電腦才是工作主機。",
+            "lead": "手機可以看進度、補指令、批准低風險下一步；但真正執行檔案、瀏覽器、Office 的仍是電腦端 Codex。",
+            "points": [
+                  [
+                        "手機",
+                        "看進度、補指令。"
+                  ],
+                  [
+                        "電腦",
+                        "執行任務。"
+                  ],
+                  [
+                        "安全",
+                        "看不清楚就不要批准。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "49 手機提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "手機遠端狀態提示詞",
+            "code": "我現在用手機遠端查看 Codex。請先回報目前在哪一台電腦、工作資料夾是哪裡、任務進度到哪裡、需要我確認什麼。除非我明確批准，請不要刪除、覆蓋、送出表單、付款或公開發布。",
+            "notes": []
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "50 練習七 C 槽",
+            "eyebrow": "練習七",
+            "title": "知識點：清 C 槽最重要的不是清，是不要清錯。",
+            "lead": "台上先講：AI 可以幫你盤點大檔、重複檔、暫存候選，但不能替你決定人生檔案、系統檔案要不要刪。",
+            "points": [
+                  [
+                        "上一堂連結",
+                        "AI 幫你做更快；這堂教你怎麼做得安全。"
+                  ],
+                  [
+                        "作品",
+                        "清理建議表。"
+                  ],
+                  [
+                        "避坑",
+                        "AI 說可清，不代表可以直接刪。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "prompt",
+            "theme": "dark",
+            "label": "51 練習七 提示詞",
+            "eyebrow": "請學員貼上",
+            "title": "C 槽安全清理提示詞",
+            "code": "請幫我檢查這個假資料夾裡有哪些檔案可能可以清理。請注意：不要刪除任何檔案，不要移動任何檔案，只做清單，分成「可能可清」、「需要人工確認」、「不要碰」，並說明原因。",
+            "notes": []
+      },
+      {
+            "kind": "check",
+            "theme": "dark",
+            "label": "52 一定要人工確認",
+            "eyebrow": "安全邊界",
+            "title": "這些事情，不交給 AI 自動處理。",
+            "items": [
+                  "刪除檔案",
+                  "覆蓋檔案",
+                  "移動大量檔案",
+                  "送出表單",
+                  "付款、訂閱、下單",
+                  "下載陌生軟體",
+                  "客戶個資與會計正式資料"
+            ],
+            "footer": "AI 可以代做流程，但不能代替你做風險決定。",
+            "notes": []
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "53 常見卡關",
+            "eyebrow": "現場救援",
+            "title": "卡住時，不要亂按。",
+            "rows": [
+                  [
+                        "找不到檔案",
+                        "回桌面，打開 Codex課堂實作素材包。"
+                  ],
+                  [
+                        "不知道丟哪個",
+                        "看檔名是否有「丟給Codex」。"
+                  ],
+                  [
+                        "畫面不同",
+                        "請 Codex 回報目前在哪個資料夾。"
+                  ],
+                  [
+                        "要刪檔",
+                        "先停，問老師。"
+                  ],
+                  [
+                        "結果太長",
+                        "請 Codex 用表格摘要。"
+                  ]
+            ],
+            "notes": []
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "54 今日成果檢查",
+            "eyebrow": "收尾",
+            "title": "今天完成什麼？",
+            "items": [
+                  "能登入 Codex",
+                  "知道先丟檔案，再輸入提示詞",
+                  "完成資料夾盤點",
+                  "完成 Excel 會報或複核",
+                  "完成 Word/PPT 大綱",
+                  "完成電腦問題排查與低風險解決步驟",
+                  "知道 C 槽不能亂刪"
+            ],
+            "notes": []
+      }
+];
 
     function esc(text) {
       return String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));

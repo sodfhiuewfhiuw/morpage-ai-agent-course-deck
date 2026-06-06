@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>04 路線規劃 任務卡</title>
+  <style>
+    body { margin: 0; font-family: "Microsoft JhengHei", Arial, sans-serif; background: #f4f7fb; color: #111827; }
+    main { max-width: 880px; margin: 0 auto; padding: 28px 20px 52px; }
+    header { background: #fff; border: 1px solid #d8dee8; border-radius: 10px; padding: 28px; box-shadow: 0 14px 36px rgba(15,23,42,.08); }
+    .tag { color: #1f5fbf; font-weight: 900; }
+    h1 { margin: 8px 0 10px; font-size: 42px; line-height: 1.15; }
+    .lead { font-size: 20px; line-height: 1.7; color: #374151; }
+    section { margin-top: 16px; background: #fff; border: 1px solid #d8dee8; border-radius: 10px; padding: 22px; }
+    h2 { margin: 0 0 10px; font-size: 24px; }
+    p { margin: 0; line-height: 1.75; font-size: 18px; }
+    .prompt { background: #f8fafc; border: 1px solid #d8dee8; border-radius: 8px; padding: 14px; }
+    button { margin-top: 12px; border: 0; border-radius: 7px; background: #111827; color: white; padding: 10px 14px; font-weight: 800; cursor: pointer; }
+    button.done { background: #166534; }
+    .safe { background: #fff7ed; border-color: #fed7aa; color: #9a3412; font-weight: 900; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="tag">第 04 站｜路線規劃</div>
+      <h1>學員名單行政整理</h1>
+      <p class="lead">把出席、繳費、作業整理成清楚的行政路線。</p>
+    </header>
+    <section>
+      <h2>知識點</h2>
+      <p>名單不是資料，是下一步行動。</p>
+    </section>
+    <section>
+      <h2>第 1 步：丟給 Codex 什麼</h2>
+      <p>丟給 Codex：丟給Codex_練習四_課程學員名單.xlsx</p>
+    </section>
+    <section>
+      <h2>第 2 步：再輸入提示詞</h2>
+      <p class="prompt">請整理這份學員名單，幫我列出未出席、未繳費、未交作業、需要關懷提醒的學員。請依照分組整理成行政待辦清單，並附上建議提醒文字。</p>
+      <button class="copy" data-copy="請整理這份學員名單，幫我列出未出席、未繳費、未交作業、需要關懷提醒的學員。請依照分組整理成行政待辦清單，並附上建議提醒文字。">複製提示詞</button>
+    </section>
+    <section>
+      <h2>完成標準</h2>
+      <p>行政待辦名單</p>
+    </section>
+    <section class="safe">
+      <h2>安全提醒</h2>
+      <p>不要只叫 AI 看名單，要指定它輸出待辦。</p>
+    </section>
+  </main>
+  <script>
+    for (const btn of document.querySelectorAll('.copy')) {
+      btn.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = '已複製';
+        btn.classList.add('done');
+        setTimeout(() => {
+          btn.textContent = '複製提示詞';
+          btn.classList.remove('done');
+        }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

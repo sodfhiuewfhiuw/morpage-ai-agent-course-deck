@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>06 故障排查 任務卡</title>
+  <style>
+    body { margin: 0; font-family: "Microsoft JhengHei", Arial, sans-serif; background: #f4f7fb; color: #111827; }
+    main { max-width: 880px; margin: 0 auto; padding: 28px 20px 52px; }
+    header { background: #fff; border: 1px solid #d8dee8; border-radius: 10px; padding: 28px; box-shadow: 0 14px 36px rgba(15,23,42,.08); }
+    .tag { color: #1f5fbf; font-weight: 900; }
+    h1 { margin: 8px 0 10px; font-size: 42px; line-height: 1.15; }
+    .lead { font-size: 20px; line-height: 1.7; color: #374151; }
+    section { margin-top: 16px; background: #fff; border: 1px solid #d8dee8; border-radius: 10px; padding: 22px; }
+    h2 { margin: 0 0 10px; font-size: 24px; }
+    p { margin: 0; line-height: 1.75; font-size: 18px; }
+    .prompt { background: #f8fafc; border: 1px solid #d8dee8; border-radius: 8px; padding: 14px; }
+    button { margin-top: 12px; border: 0; border-radius: 7px; background: #111827; color: white; padding: 10px 14px; font-weight: 800; cursor: pointer; }
+    button.done { background: #166534; }
+    .safe { background: #fff7ed; border-color: #fed7aa; color: #9a3412; font-weight: 900; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="tag">第 06 站｜故障排查</div>
+      <h1>電腦出問題時請 Agent 排查並解決</h1>
+      <p class="lead">電腦變慢、過熱、當機、檔案找不到、Office 打不開時，先讓 Agent 排查，再一步步帶你解決。</p>
+    </header>
+    <section>
+      <h2>知識點</h2>
+      <p>先描述症狀，再讓 Agent 分析原因，最後做低風險解決步驟。</p>
+    </section>
+    <section>
+      <h2>第 1 步：丟給 Codex 什麼</h2>
+      <p>不用先丟檔案。先把電腦症狀、錯誤訊息、發生時間、最近做過什麼告訴 Codex。</p>
+    </section>
+    <section>
+      <h2>第 2 步：再輸入提示詞</h2>
+      <p class="prompt">我的電腦現在遇到一個問題，可能是變慢、過熱、當機、檔案找不到、Office 打不開或 Chrome 異常。請先不要刪除、下載、關閉防毒或修改系統設定。請先問我 3 到 5 個必要問題，確認症狀、發生時間、影響範圍、最近是否安裝新軟體或移動檔案。接著請列出可能原因，並依照「低風險可先做」「需要我確認」「不要自己做」三類給我解決步驟。每一步請說明目的、怎麼做、做完要觀察什麼。</p>
+      <button class="copy" data-copy="我的電腦現在遇到一個問題，可能是變慢、過熱、當機、檔案找不到、Office 打不開或 Chrome 異常。請先不要刪除、下載、關閉防毒或修改系統設定。請先問我 3 到 5 個必要問題，確認症狀、發生時間、影響範圍、最近是否安裝新軟體或移動檔案。接著請列出可能原因，並依照「低風險可先做」「需要我確認」「不要自己做」三類給我解決步驟。每一步請說明目的、怎麼做、做完要觀察什麼。">複製提示詞</button>
+    </section>
+    <section>
+      <h2>完成標準</h2>
+      <p>問題排查清單 + 低風險解決步驟</p>
+    </section>
+    <section class="safe">
+      <h2>安全提醒</h2>
+      <p>不要一開始就叫 AI 刪檔、下載工具、關防毒或改系統設定。</p>
+    </section>
+  </main>
+  <script>
+    for (const btn of document.querySelectorAll('.copy')) {
+      btn.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = '已複製';
+        btn.classList.add('done');
+        setTimeout(() => {
+          btn.textContent = '複製提示詞';
+          btn.classList.remove('done');
+        }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>
