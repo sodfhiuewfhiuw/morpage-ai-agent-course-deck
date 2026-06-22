@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codex AI Agent 電腦工作助理實戰</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --fg: #111111;
+      --muted: #676767;
+      --border: #e5e5e5;
+      --accent: #2f6feb;
+      --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --danger: #dc2626;
+      --success: #16803a;
+      --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.5;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { text-wrap: balance; letter-spacing: 0; }
+    p, li { text-wrap: pretty; }
+
+    #deck { position: fixed; inset: 0; }
+    .slide {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      padding: clamp(38px, 5.4vw, 78px) clamp(46px, 6.8vw, 104px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+      transition: transform 260ms var(--ease-standard), opacity 180ms var(--ease-standard);
+    }
+    .slide.is-active { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 1; }
+    .slide.is-before { transform: translateX(-100%); }
+    .slide.dark { background: var(--fg); color: var(--bg); }
+    .slide.dark .lead, .slide.dark .muted, .slide.dark li { color: color-mix(in oklab, var(--bg), transparent 20%); }
+    .slide.dark .plain-card, .slide.dark .step-box, .slide.dark .teacher-panel { background: color-mix(in oklab, var(--bg), transparent 92%); border-color: color-mix(in oklab, var(--bg), transparent 82%); }
+    .slide.dark .plain-card h3, .slide.dark .step-box h3, .slide.dark .teacher-panel h3 { color: var(--bg); }
+    .slide.dark .safety-strip { background: color-mix(in oklab, var(--bg), transparent 90%); color: var(--bg); border-color: color-mix(in oklab, var(--bg), transparent 74%); }
+
+    .center { align-items: center; text-align: center; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .h-hero { font-size: clamp(54px, 7.8vw, 112px); line-height: 1.04; margin: 0 0 20px; font-weight: 760; max-width: 12ch; }
+    .h-xl { font-size: clamp(42px, 5.2vw, 70px); line-height: 1.12; margin: 0 0 20px; font-weight: 740; max-width: 18ch; }
+    .h-md { font-size: clamp(34px, 4vw, 52px); line-height: 1.16; margin: 0 0 20px; font-weight: 720; max-width: 20ch; }
+    .lead { font-size: clamp(21px, 2.1vw, 30px); color: var(--muted); line-height: 1.55; max-width: 58ch; }
+    .center .lead { margin-inline: auto; }
+
+    .hero-flow { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 16px; width: min(880px, 100%); margin-top: 42px; }
+    .plain-card, .step-box, .teacher-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+    }
+    .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 28px; line-height: 1.2; margin-bottom: 10px; }
+    .plain-card p, .step-box p, .teacher-panel p { color: var(--muted); margin: 0; font-size: 19px; }
+
+    .three-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 34px; }
+    .two-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; margin-top: 34px; }
+    .four-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 32px; }
+    .flow-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 34px; }
+    .flow-list .step-box { min-height: 170px; }
+    .num { font-family: var(--font-mono); color: var(--accent); font-size: 14px; margin-bottom: 14px; display: block; }
+
+    .screen-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr);
+      gap: 36px;
+      align-items: center;
+      min-height: 0;
+    }
+    .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(340px, 0.86fr); }
+    .screenshot-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      height: min(72vh, 620px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px color-mix(in oklab, var(--fg), transparent 93%);
+      margin: 0;
+    }
+    .screenshot-frame img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+    .teacher-panel { padding: 24px; }
+    .teacher-panel h2 { font-size: clamp(30px, 3.4vw, 46px); line-height: 1.15; margin-bottom: 18px; }
+    .teach-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 13px; }
+    .teach-list li {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .teach-list strong { color: var(--fg); display: block; margin-bottom: 4px; }
+    .slide.dark .teach-list strong { color: var(--bg); }
+    .teach-list .warn strong { color: var(--warn); }
+    .safety-strip {
+      margin-top: 18px;
+      border: 1px solid color-mix(in oklab, var(--warn), transparent 72%);
+      background: var(--warn-soft);
+      color: #7c2d12;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-weight: 700;
+    }
+
+    .check-list { display: grid; gap: 14px; margin-top: 28px; max-width: 1000px; }
+    .check-list li { list-style: none; border-top: 1px solid var(--border); padding-top: 13px; font-size: clamp(21px, 2.1vw, 29px); }
+    .check-list strong { color: var(--accent); margin-right: 10px; font-family: var(--font-mono); font-size: 16px; }
+    .quote { font-size: clamp(38px, 5vw, 70px); line-height: 1.16; max-width: 15ch; font-weight: 760; }
+    .template-box {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 32px;
+      align-items: start;
+      margin-top: 28px;
+    }
+    .template-code {
+      font-family: var(--font-mono);
+      white-space: pre-wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.55;
+      max-height: 64vh;
+      overflow: hidden;
+    }
+    .slide.dark .template-code { background: color-mix(in oklab, var(--bg), transparent 92%); border-color: color-mix(in oklab, var(--bg), transparent 82%); color: var(--bg); }
+    .notes { display: none; }
+
+    .deck-counter {
+      position: fixed;
+      right: 30px;
+      bottom: 24px;
+      z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg);
+    }
+    .deck-hint {
+      position: fixed;
+      left: 30px;
+      bottom: 25px;
+      z-index: 10;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .deck-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0;
+      background: var(--accent);
+      z-index: 10;
+      transition: width 200ms var(--ease-standard);
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 32px 26px 62px; }
+      .screen-layout, .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(230px, 0.86fr); gap: 16px; }
+      .template-box { grid-template-columns: 1fr; gap: 18px; }
+      .screenshot-frame { height: 58vh; }
+      .three-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .two-grid, .four-grid, .flow-list, .hero-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .plain-card, .step-box, .teacher-panel { padding: 16px; }
+      .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 22px; }
+      .plain-card p, .step-box p, .teacher-panel p, .teach-list li { font-size: 16px; }
+      .lead { font-size: 20px; }
+      .h-hero { font-size: 52px; }
+      .h-xl { font-size: 40px; }
+      .h-md { font-size: 32px; }
+    }
+    @media (max-width: 620px), (max-height: 680px) {
+      .slide { padding: 24px 26px 56px; }
+      .eyebrow { margin-bottom: 10px; font-size: 11px; }
+      .lead { font-size: 18px; line-height: 1.42; }
+      .h-hero { font-size: 44px; line-height: 1.04; }
+      .h-xl { font-size: 34px; line-height: 1.1; margin-bottom: 12px; }
+      .h-md { font-size: 28px; line-height: 1.12; margin-bottom: 12px; }
+      .three-grid, .two-grid, .four-grid, .flow-list, .hero-flow { gap: 10px; margin-top: 16px; }
+      .plain-card, .step-box, .teacher-panel { padding: 13px; }
+      .plain-card h3, .step-box h3, .teacher-panel h3 { font-size: 20px; margin-bottom: 6px; }
+      .plain-card p, .step-box p, .teacher-panel p, .teach-list li { font-size: 14px; line-height: 1.38; }
+      .check-list { gap: 8px; margin-top: 14px; }
+      .check-list li { font-size: 18px; padding-top: 8px; }
+      .template-code { font-size: 13px; line-height: 1.38; padding: 14px; max-height: 52vh; }
+      .screen-layout, .screen-layout.compact { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.9fr); gap: 12px; }
+      .screenshot-frame { height: 62vh; padding: 8px; }
+      .teach-list { gap: 8px; }
+      .teach-list li { padding-top: 8px; }
+      .safety-strip { margin-top: 10px; padding: 10px 12px; font-size: 14px; }
+    }
+    @media print {
+      body { overflow: visible; }
+      .slide { position: relative; opacity: 1; pointer-events: auto; transform: none; page-break-after: always; }
+      .deck-counter, .deck-hint, .deck-progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main id="deck" aria-live="polite"></main>
+  <div class="deck-progress" id="deck-progress" aria-hidden="true"></div>
+  <div class="deck-counter" id="deck-counter">1 / 45</div>
+  <div class="deck-hint">← / → · 滑動 · 點左右半邊</div>
+
+  <script>
+    const slides = [
+      {
+            "kind": "hero",
+            "theme": "light center",
+            "label": "01 封面",
+            "eyebrow": "Codex AI Agent 實戰課",
+            "title": "AI 開始幫你接手流程",
+            "lead": "從問 AI 問題，到把工作交給 AI 幫你完成。這堂課不是要你變成工程師，而是練習怎麼把資料交給 AI、把任務說清楚、看懂回報，確認後再讓它動手。",
+            "cards": [
+                  [
+                        "以前",
+                        "問 AI"
+                  ],
+                  [
+                        "現在",
+                        "交辦 AI"
+                  ],
+                  [
+                        "重點",
+                        "講清楚"
+                  ],
+                  [
+                        "原則",
+                        "人確認"
+                  ]
+            ],
+            "notes": [
+                  "以前是問 AI，現在是交辦 AI。"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "02 這堂課給誰",
+            "eyebrow": "學員定位",
+            "title": "這堂課不是給工程師而已。",
+            "lead": "只要你有工作要整理、有資料要處理、有流程想加速，就用得到。",
+            "points": [
+                  [
+                        "你可能是",
+                        "上班族、小老闆、接案者、行政人員、業務人員、內容創作者。"
+                  ],
+                  [
+                        "你不需要",
+                        "會寫程式，也不需要記很多 AI 名詞。"
+                  ],
+                  [
+                        "你只需要",
+                        "把你要做的事情，講到 AI 聽得懂。"
+                  ]
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "dark center",
+            "label": "03 今天只記兩件事",
+            "eyebrow": "核心觀念",
+            "title": "Agent 會接手流程，但結果一定要由人確認。",
+            "lead": "第一，Agent 是會接手流程的 AI 工作助理。第二，AI 做完之後，你一定要檢查。",
+            "points": [
+                  [
+                        "Agent",
+                        "看資料、用工具、整理結果，一步一步幫你完成任務。"
+                  ],
+                  [
+                        "檢查",
+                        "AI 可以幫你加速，但最後確認的人還是你。"
+                  ],
+                  [
+                        "金句",
+                        "AI 負責加速，人負責確認。"
+                  ]
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "04 AI 名詞地圖",
+            "eyebrow": "先有地圖，不用背名詞",
+            "title": "這堂課會碰到六個基礎概念。",
+            "rows": [
+                  [
+                        "Agent",
+                        "會接手任務流程的 AI 工作助理。"
+                  ],
+                  [
+                        "LLM",
+                        "AI 的語言大腦，負責理解、推理、回答。"
+                  ],
+                  [
+                        "Token",
+                        "AI 這次能讀多少內容、記多少上下文。"
+                  ],
+                  [
+                        "Tool",
+                        "AI 可以使用的工具，例如瀏覽器、檔案、Office、網頁。"
+                  ],
+                  [
+                        "Skill",
+                        "把一套好用流程保存下來，讓 AI 下次照著做。"
+                  ],
+                  [
+                        "Markdown / HTML",
+                        "AI 很常讀、也很常輸出的文字格式。"
+                  ]
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "05 基本 AI 操盤手",
+            "eyebrow": "你只要懂這些",
+            "title": "你只要懂這些，就能成為基本的 AI 操盤手。",
+            "lead": "不用懂很深的技術，但要知道怎麼指揮 AI。",
+            "points": [
+                  [
+                        "懂大腦",
+                        "知道 LLM 能做什麼、不能做什麼。"
+                  ],
+                  [
+                        "懂容量",
+                        "知道資料太多時要分段處理。"
+                  ],
+                  [
+                        "懂流程",
+                        "知道任務要一步一步交辦，AI 做完後要怎麼回報你。"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "dark",
+            "label": "06 講清楚，也要驗證",
+            "eyebrow": "安全觀念",
+            "title": "AI 可以幫你做事，但不能完全相信它。",
+            "items": [
+                  "AI 講得很像真的，不代表它一定是真的。",
+                  "AI 可能會看錯、漏看、亂猜、一本正經地講錯。",
+                  "任務要講清楚：目標、資料、工具、回報、邊界、驗證。",
+                  "重要結果，一定要驗證。"
+            ],
+            "footer": "AI 可以幫你加速，但最後判斷的人還是你。"
+      },
+      {
+            "kind": "flow",
+            "theme": "light",
+            "label": "07 Agent 工作流公式",
+            "eyebrow": "把任務拆成流程",
+            "title": "不要只問一句話，要一步一步交代清楚。",
+            "steps": [
+                  [
+                        "01",
+                        "給資料",
+                        "先給它材料。"
+                  ],
+                  [
+                        "02",
+                        "說目標",
+                        "再說你要什麼。"
+                  ],
+                  [
+                        "03",
+                        "請整理",
+                        "讓它先整理或分析。"
+                  ],
+                  [
+                        "04",
+                        "看回報",
+                        "人看過結果。"
+                  ],
+                  [
+                        "05",
+                        "再確認",
+                        "確認沒問題，才進下一步。"
+                  ]
+            ],
+            "footer": "會用 AI 的人，不是問得很神，是會一步一步交代清楚。"
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "08 什麼要丟給 Codex",
+            "eyebrow": "課堂資料規則",
+            "title": "看檔名，就知道要不要丟給 Codex。",
+            "rows": [
+                  [
+                        "可以丟",
+                        "丟給Codex_客戶資料.xlsx、丟給Codex_會議紀錄.docx、丟給Codex_資料夾練習。"
+                  ],
+                  [
+                        "先不要丟",
+                        "不用丟_簡報範例.pptx、提醒文字、私人資料、公司機密。"
+                  ],
+                  [
+                        "絕對不要",
+                        "客戶真實名單、帳號密碼、金流資料。"
+                  ],
+                  [
+                        "今天原則",
+                        "先用假資料練流程，學會之後再判斷哪些真資料可以使用。"
+                  ]
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "09 Codex 下載",
+            "eyebrow": "操作 01",
+            "title": "第一步，先下載 Codex",
+            "img": "01_codex_website_link.png",
+            "say": "請從老師提供的官方連結進入，不要自己亂搜尋下載。",
+            "doText": "打開老師提供的 Codex 下載連結。",
+            "success": "看到正確下載頁與可下載的安裝檔。",
+            "caution": "不要下載來路不明的安裝檔、廣告檔或破解檔。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "10 下載選擇",
+            "eyebrow": "操作 02",
+            "title": "選擇你的電腦版本",
+            "img": "02_download_choice.png",
+            "say": "今天用 Windows 示範，請 Windows 同學選 Windows 版本。",
+            "doText": "依自己的作業系統選擇下載。",
+            "success": "下載列或下載資料夾裡出現安裝檔。",
+            "caution": "Mac 與 Windows 畫面可能不同，跟自己的電腦選。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "11 執行安裝檔",
+            "eyebrow": "操作 03",
+            "title": "下載完成後，點開安裝檔",
+            "img": "03_download_complete_click_exe.png",
+            "say": "從瀏覽器下載列或下載資料夾找到 EXE。",
+            "doText": "打開剛剛下載好的 Codex 安裝檔。",
+            "success": "看到 Windows 安裝或安全提示。",
+            "caution": "不要重複下載很多次，也不要亂點其他不明檔案。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "12 儲存與安裝",
+            "eyebrow": "操作 04",
+            "title": "確認來源，開始安裝",
+            "img": "04_save_installer.png",
+            "say": "看到安全提醒，不是叫你亂按，而是提醒你先確認。",
+            "doText": "按下保留、儲存或繼續安裝。",
+            "success": "看到 Codex 安裝進度，或 Codex 開始啟動。",
+            "caution": "確認是從老師提供的官方連結下載，再繼續。"
+      },
+      {
+            "kind": "concept",
+            "theme": "dark center",
+            "label": "13 中場休息",
+            "eyebrow": "Break Time",
+            "title": "中場休息時間",
+            "lead": "讓安裝比較慢的電腦追上進度。休息回來，我們繼續登入與認識 Codex 主畫面。",
+            "points": [
+                  [
+                        "先休息",
+                        "喝水、上洗手間、整理桌面。"
+                  ],
+                  [
+                        "順手確認",
+                        "Codex 是否還在安裝，或是否已經開啟。"
+                  ],
+                  [
+                        "有問題",
+                        "現在請舉手讓老師或助教協助。"
+                  ]
+            ]
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "14 安裝進行中",
+            "eyebrow": "操作 05",
+            "title": "等待 Codex 安裝完成",
+            "img": "06_installing.png",
+            "say": "安裝時請稍等一下，不要急著重複點很多次。",
+            "doText": "等待安裝進度跑完。",
+            "success": "Codex 開啟，或出現登入畫面。",
+            "caution": "如果卡太久，再請老師或助教協助。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "15 ChatGPT / OpenAI 登入",
+            "eyebrow": "操作 06",
+            "title": "用自己的 ChatGPT / OpenAI 帳號登入",
+            "img": "07_codex_login_page.png",
+            "say": "帳號、密碼、驗證碼，都由本人自己輸入。",
+            "doText": "點選登入，完成授權。",
+            "success": "看到 Codex 主畫面或登入成功頁。",
+            "caution": "不要把密碼交給 AI，不要截圖分享登入畫面。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "16 登入成功",
+            "eyebrow": "操作 07",
+            "title": "看到主畫面，就代表登入完成",
+            "img": "10_login_success.png",
+            "say": "接下來不要急著亂點，先認識幾個最重要的位置。",
+            "doText": "停在主畫面，跟著老師看介面。",
+            "success": "你可以開始輸入第一句指令。",
+            "caution": "先不要自己亂切設定。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "17 Codex 主畫面",
+            "eyebrow": "操作 08",
+            "title": "這裡是任務開始的地方",
+            "img": "11_codex_main_clean.png",
+            "say": "交辦任務、丟檔案、看回報，都會從這裡開始。",
+            "doText": "找到輸入任務、加入檔案、看回報的位置。",
+            "success": "知道要從哪裡開始一個任務。",
+            "caution": "今天先不用學全部功能，先知道最常用的地方。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "18 左側選單",
+            "eyebrow": "操作 09",
+            "title": "左側是管理任務的地方",
+            "img": "14_left_sidebar.png",
+            "say": "新聊天、搜尋、外掛、自動化、專案、設定，都在這附近。",
+            "doText": "找到左側選單。",
+            "success": "知道要開新任務或找之前內容時從哪裡開始。",
+            "caution": "今天不深入所有功能，只介紹跟課堂有關的部分。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "19 模型與智慧功能",
+            "eyebrow": "操作 10",
+            "title": "不同任務，需要不同思考強度",
+            "img": "15_model_reasoning_speed_menu.png",
+            "say": "模型像不同等級的 AI 引擎，速度、深度和用量會不同。",
+            "doText": "找到模型、智慧功能與速度設定。",
+            "success": "知道高智慧可能比較慢，也比較吃使用量。",
+            "caution": "先用老師建議的設定，先求穩定，再追求進階。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "20 權限選擇",
+            "eyebrow": "操作 11",
+            "title": "不要什麼都給 AI 自動做",
+            "img": "17_permission_menu.png",
+            "say": "權限越高，越需要你確認。",
+            "doText": "理解哪些操作需要停下來確認。",
+            "success": "知道刪檔、寄信、發文、付款、公開發布不能自動放行。",
+            "caution": "AI 可以幫你按按鈕，但不能替你負責後果。",
+            "safety": "先停、先看、先確認。"
+      },
+      {
+            "kind": "action",
+            "theme": "light",
+            "label": "21 追求目標",
+            "eyebrow": "操作 12",
+            "title": "追求目標很強，但很吃使用量",
+            "img": "33_goal_toggle_unavailable_or_unstable.png",
+            "say": "除非你是 Pro 用戶，或很清楚額度預算，不然先不要亂開。",
+            "doText": "知道這個功能存在，但今天先不使用。",
+            "success": "理解它可能連續規劃、執行、檢查、重試。",
+            "caution": "不是不能用，是不要不知道成本就開下去。"
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "22 練習一",
+            "eyebrow": "資料夾練習",
+            "title": "練習一：整理混亂的資料夾",
+            "lead": "這次我們要讓 Codex 幫忙整理資料夾。今天先用老師準備好的練習資料夾，不要用自己的真實資料。",
+            "points": [
+                  [
+                        "常見情況",
+                        "檔名很亂、檔案類型混在一起。"
+                  ],
+                  [
+                        "練習目標",
+                        "讓 Codex 先看懂，再提出整理方式。"
+                  ],
+                  [
+                        "安全原則",
+                        "第一步不是讓 AI 亂動，而是先讓它看懂。"
+                  ]
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "23 先打開兩個混亂資料夾",
+            "eyebrow": "練習準備",
+            "title": "先打開資料夾看一下。",
+            "lead": "老師會準備兩個練習資料夾：第一次練習資料夾、第二次練習資料夾。",
+            "points": [
+                  [
+                        "先看",
+                        "裡面是不是很亂？是不是很多檔案混在一起？"
+                  ],
+                  [
+                        "先不要",
+                        "現在先不要丟給 Codex，先用眼睛看一下。"
+                  ],
+                  [
+                        "為什麼",
+                        "看過混亂，才知道 AI 等一下幫了什麼忙。"
+                  ]
+            ]
+      },
+      {
+            "kind": "prompt",
+            "theme": "light",
+            "label": "24 第一次練習",
+            "eyebrow": "老師帶做",
+            "title": "第一次練習：整理第一個資料夾",
+            "code": "請幫我整理這個資料夾。\n\n請先看一下裡面的檔案，\n幫我依照檔案類型和用途重新分類。\n\n請告訴我：\n1. 這個資料夾裡大概有哪些檔案\n2. 你建議怎麼分類\n3. 每一類資料夾可以叫什麼名字\n\n請先不要刪除任何檔案。"
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "25 第二次練習",
+            "eyebrow": "換你自己做",
+            "title": "第二次練習：換你自己整理第二個資料夾。",
+            "lead": "這一次換你自己操作。你可以照抄剛剛的指令，也可以改成更像你平常會說的話。",
+            "points": [
+                  [
+                        "說清楚",
+                        "你要它整理什麼。"
+                  ],
+                  [
+                        "加邊界",
+                        "你不希望它做什麼。"
+                  ],
+                  [
+                        "要回報",
+                        "你希望它怎麼回報。記得加：請先不要刪除任何檔案。"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "dark center",
+            "label": "26 有沒有很簡單",
+            "eyebrow": "練習收尾",
+            "title": "有沒有很簡單？",
+            "items": [
+                  "打開資料夾看一下。",
+                  "把資料夾交給 Codex。",
+                  "說清楚你要它整理。",
+                  "提醒它不要刪除檔案。",
+                  "看它怎麼分類和回報。"
+            ],
+            "footer": "AI 負責加速，人負責確認。"
+      },
+      {
+            "kind": "concept",
+            "theme": "dark",
+            "label": "27 AI 阿拉丁神燈",
+            "eyebrow": "許願之前先想清楚",
+            "title": "AI 很像阿拉丁神燈。",
+            "lead": "你跟它許願，它真的會想辦法幫你實現。但如果你自己都不知道想要什麼，AI 可能只會把你的混亂放大。",
+            "points": [
+                  [
+                        "先問自己",
+                        "我到底想要什麼？我為什麼想要？"
+                  ],
+                  [
+                        "再想後果",
+                        "這件事真的重要嗎？我願意承擔它的後果嗎？"
+                  ],
+                  [
+                        "金句",
+                        "AI 會放大你的願望，也會放大你的混亂。"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "28 AI 素養",
+            "eyebrow": "本堂課最重要的一頁",
+            "title": "使用 AI 的素養，不是會寫 prompt，而是會懷疑、追問、檢查。",
+            "items": [
+                  "如果你不清楚自己的想法，問 AI。",
+                  "如果你不確定 Agent 有沒有唬爛你，把疑惑說出來，問 AI。",
+                  "如果你想知道這可不可以做，問 AI。",
+                  "保持懷疑，保持中立，找出 AI 回答裡不合理的地方。"
+            ],
+            "footer": "不是全信，也不是全否定。是先問、再查、再判斷。"
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "29 語音模式自由練習",
+            "eyebrow": "15 分鐘",
+            "title": "按 Control + D，進入語音模式。",
+            "lead": "把你現在第一個想法講給 AI 聽。這一段不用追求成功，只是感受跟 Agent 互動。",
+            "points": [
+                  [
+                        "可以說",
+                        "我想整理資料夾、寫一封信、做活動企劃。"
+                  ],
+                  [
+                        "也可以說",
+                        "我想規劃副業、做簡單網站、整理混亂想法。"
+                  ],
+                  [
+                        "重點",
+                        "不用講得很漂亮，先把想法說出來。"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "30 分享剛剛做了什麼",
+            "eyebrow": "同學分享",
+            "title": "剛剛，你跟 AI 做了什麼？",
+            "items": [
+                  "你剛剛跟 AI 說了什麼？",
+                  "AI 有沒有追問你？",
+                  "它有沒有幫你整理想法？",
+                  "哪一句回答讓你覺得有用？",
+                  "哪裡讓你覺得怪怪的？",
+                  "如果再來一次，你會怎麼問？"
+            ],
+            "footer": "有時候最有價值的，是 AI 幫你看見自己沒講清楚什麼。"
+      },
+      {
+            "kind": "concept",
+            "theme": "light",
+            "label": "31 拆一個想法",
+            "eyebrow": "如果還有時間",
+            "title": "把一個想法，拆成可以交辦的任務。",
+            "lead": "我們現場挑一個同學的想法來拆，從一句願望變成下一步。",
+            "points": [
+                  [
+                        "看需求",
+                        "這個人真正想要什麼？"
+                  ],
+                  [
+                        "拆步驟",
+                        "這件事可以拆成哪些步驟？哪些部分可以交給 AI？"
+                  ],
+                  [
+                        "下一句",
+                        "哪些地方一定要人判斷？下一句應該怎麼問 AI？"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "32 電腦健康檢查",
+            "eyebrow": "日常保養",
+            "title": "你也可以請 Codex 幫電腦做健康檢查。",
+            "items": [
+                  "看哪裡很亂。",
+                  "看哪裡很佔空間。",
+                  "列出整理建議。",
+                  "檢查桌面、下載資料夾、重複檔案、硬碟空間。",
+                  "先看報告，不要先刪東西。"
+            ],
+            "footer": "健康檢查不是清空電腦。先檢查、先回報、先確認。"
+      },
+      {
+            "kind": "prompt",
+            "theme": "light",
+            "label": "33 GitHub 前人作品",
+            "eyebrow": "不會寫程式也可以借用前人的作品",
+            "title": "你們不會寫程式，沒關係。",
+            "code": "我現在的狀態是：\n[說明你的狀態]\n\n我想解決的問題是：\n[說明你的需求]\n\n我卡在：\n[說明卡住的地方]\n\n請你幫我看這個 GitHub 專案：\nhttps://github.com/msitarzewski/agency-agents\n\n送出前我會先點 Codex 的「規劃模式」。\n請先幫我規劃，不要直接執行。\n等我確認計畫沒問題後，再進入下一步。"
+      },
+      {
+            "kind": "prompt",
+            "theme": "light",
+            "label": "34 變成 Skill",
+            "eyebrow": "好用的流程，不要只用一次",
+            "title": "把剛剛的流程變成 Skill",
+            "code": "請把我剛才的所有流程，\n整理成一個可以重複使用、\n可以複製保存的 Skill。\n\n請用簡單清楚的方式寫出來，\n讓我下次遇到類似任務時，\n可以直接貼上使用。"
+      },
+      {
+            "kind": "compare",
+            "theme": "light",
+            "label": "35 Codex 的限制",
+            "eyebrow": "選對工具",
+            "title": "Codex 很強，但不是什麼都最適合交給它。",
+            "leftTitle": "比較強",
+            "left": [
+                  "自動化操作",
+                  "整理資料",
+                  "規劃流程",
+                  "看程式",
+                  "處理檔案",
+                  "網頁操作",
+                  "重複性工作"
+            ],
+            "rightTitle": "比較弱",
+            "right": [
+                  "精緻 PPT",
+                  "藝術創作",
+                  "高質感網頁",
+                  "品牌視覺設計",
+                  "需要強美感判斷的內容"
+            ]
+      },
+      {
+            "kind": "concept",
+            "theme": "dark",
+            "label": "36 我的作品",
+            "eyebrow": "Codex 自動化操作包",
+            "title": "接下來介紹我做的一個課程作品包。",
+            "lead": "它不是一般檔案，而是一包讓 Codex 讀得懂的工作助理說明書。",
+            "points": [
+                  [
+                        "它包含",
+                        "說明、流程、限制、工具、注意事項。"
+                  ],
+                  [
+                        "它示範",
+                        "讓 Codex 讀懂，然後照規則開始工作。"
+                  ],
+                  [
+                        "它不是",
+                        "讓大家亂下載、亂破解、亂安裝。"
+                  ]
+            ]
+      },
+      {
+            "kind": "table",
+            "theme": "light",
+            "label": "37 作品包可以示範什麼",
+            "eyebrow": "AI 業務行政助理 / 自動化操作包",
+            "title": "這包裡面，不只是單一功能。",
+            "rows": [
+                  [
+                        "找客戶",
+                        "示範 CRM / 網頁搜尋 / 客戶資料整理。"
+                  ],
+                  [
+                        "寄信用瀏覽器",
+                        "示範 Gmail 或寄信流程前的人為確認。"
+                  ],
+                  [
+                        "行政文書",
+                        "示範文件、表格、報告、資料夾整理。"
+                  ],
+                  [
+                        "電腦問題排查",
+                        "示範先問清楚、再列可能原因。"
+                  ],
+                  [
+                        "社群貼文",
+                        "示範 FB / IG / Threads 草稿與安全確認。"
+                  ],
+                  [
+                        "專屬 Agent 記憶",
+                        "示範讓 AI 讀懂一整套工作流程。"
+                  ]
+            ]
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "38 輕度示範",
+            "eyebrow": "老師先帶做一次",
+            "title": "老師先帶大家一步一步做一次。",
+            "items": [
+                  "打開「課程禮物」資料夾。",
+                  "雙擊「點我解鎖.pyw」。",
+                  "等待作品包解鎖完成。",
+                  "找到解鎖後的資料夾。",
+                  "把資料夾交給 Codex。",
+                  "請 Codex 先讀 CODEX_START_HERE.md。",
+                  "看 Codex 怎麼理解這個專案。"
+            ],
+            "footer": "先看，不要急著自己亂點。下一頁再換你自己練習。"
+      },
+      {
+            "kind": "prompt",
+            "theme": "light",
+            "label": "39 自己練習",
+            "eyebrow": "把作品包交給 Codex",
+            "title": "現在換你自己操作一次。",
+            "code": "請先讀這個資料夾裡的 CODEX_START_HERE.md。\n\n請你用白話告訴我：\n\n1. 這個專案是什麼\n2. 它可以幫我做哪些事情\n3. 我使用它時要注意什麼\n4. 我下一步可以做什麼"
+      },
+      {
+            "kind": "check",
+            "theme": "light",
+            "label": "40 同學分享時間",
+            "eyebrow": "最後分享",
+            "title": "最後，給大家一點分享時間。",
+            "items": [
+                  "你剛剛讓 Codex 做了什麼？",
+                  "哪一步讓你覺得新奇？",
+                  "哪一步讓你卡住？",
+                  "Codex 有沒有講出你沒想到的東西？",
+                  "如果回家再試一次，你想讓它幫你做什麼？"
+            ],
+            "footer": "有時候，聽別人怎麼用 AI，比只聽老師講更有收穫。"
+      },
+      {
+            "kind": "concept",
+            "theme": "dark center",
+            "label": "41 祝福",
+            "eyebrow": "結語",
+            "title": "希望你回去後，願意繼續嘗試。",
+            "lead": "卡關是正常的，但請相信自己做得到。",
+            "points": [
+                  [
+                        "你一定會卡關",
+                        "AI 可能聽不懂你，工具可能打不開，流程可能跑不順。"
+                  ],
+                  [
+                        "這些都正常",
+                        "結果不如預期，不代表你不適合用 AI。"
+                  ],
+                  [
+                        "最後祝福",
+                        "在科技日新月異的現在，人最大的價值，就在於無窮無盡的好奇心。"
+                  ]
+            ]
+      }
+];
+
+    function esc(text) {
+      return String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+    }
+    function notesHtml(notes) {
+      return `<aside class="notes">${(notes || []).map(line => `<p>${esc(line)}</p>`).join("")}</aside>`;
+    }
+    function cardGrid(cards) {
+      return `<div class="hero-flow">${cards.map(([h, p]) => `<div class="plain-card"><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>`;
+    }
+    function pointsGrid(points) {
+      const klass = points.length === 4 ? "four-grid" : points.length === 2 ? "two-grid" : "three-grid";
+      return `<div class="${klass}">${points.map(([h, p]) => `<div class="plain-card"><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>`;
+    }
+    function slideInner(s) {
+      if (s.kind === "hero") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h1 class="h-hero">${esc(s.title)}</h1><p class="lead">${esc(s.lead)}</p>${cardGrid(s.cards || [])}`;
+      }
+      if (s.kind === "concept") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-xl">${esc(s.title)}</h2><p class="lead">${esc(s.lead)}</p>${pointsGrid(s.points || [])}`;
+      }
+      if (s.kind === "table") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="check-list">${s.rows.map(([h, p], i) => `<li><strong>${String(i + 1).padStart(2, "0")}</strong>${esc(h)}：${esc(p)}</li>`).join("")}</div>`;
+      }
+      if (s.kind === "compare") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="two-grid"><div class="plain-card"><h3>${esc(s.leftTitle)}</h3><ul>${s.left.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div><div class="plain-card"><h3>${esc(s.rightTitle)}</h3><ul>${s.right.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>`;
+      }
+      if (s.kind === "flow") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="flow-list">${s.steps.map(([n, h, p]) => `<div class="step-box"><span class="num">${esc(n)}</span><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join("")}</div>${s.footer ? `<div class="safety-strip">${esc(s.footer)}</div>` : ""}`;
+      }
+      if (s.kind === "action") {
+        return `<div class="screen-layout"><figure class="screenshot-frame"><img src="assets/screenshots/${esc(s.img)}" alt="${esc(s.title)}截圖" /></figure><div class="teacher-panel"><p class="eyebrow">${esc(s.eyebrow)}</p><h2>${esc(s.title)}</h2><ul class="teach-list"><li><strong>老師說</strong><span>${esc(s.say)}</span></li><li><strong>學員做</strong><span>${esc(s.doText)}</span></li><li><strong>成功標準</strong><span>${esc(s.success)}</span></li><li class="warn"><strong>注意事項</strong><span>${esc(s.caution)}</span></li></ul>${s.safety ? `<div class="safety-strip">${esc(s.safety)}</div>` : ""}</div></div>`;
+      }
+      if (s.kind === "prompt" || s.kind === "template") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><div class="template-box"><p class="lead">${s.kind === "prompt" ? "請學員直接貼上或依自己的商品資料替換。重點是把限制寫清楚。" : "請學員照模板填寫，先完成一個可交辦、可檢查的小流程。"}</p><pre class="template-code">${esc(s.code)}</pre></div>`;
+      }
+      if (s.kind === "check") {
+        return `<p class="eyebrow">${esc(s.eyebrow)}</p><h2 class="h-md">${esc(s.title)}</h2><ul class="check-list">${s.items.map((x, i) => `<li><strong>${String(i + 1).padStart(2, "0")}</strong>${esc(x)}</li>`).join("")}</ul>${s.footer ? `<div class="safety-strip">${esc(s.footer)}</div>` : ""}`;
+      }
+      return "";
+    }
+
+    const deck = document.getElementById("deck");
+    deck.innerHTML = slides.map((s, i) => {
+      const classes = ["slide"].concat((s.theme || "light").split(" "));
+      return `<section class="${classes.join(" ")}" data-screen-label="${esc(s.label)}" aria-hidden="true">${slideInner(s)}${notesHtml(s.notes)}</section>`;
+    }).join("");
+
+    (function () {
+      const els = Array.from(document.querySelectorAll(".slide"));
+      const counter = document.getElementById("deck-counter");
+      const progress = document.getElementById("deck-progress");
+      const KEY = "morpage-full-deck-pos";
+      let active = 0;
+      function setActive(i) {
+        active = Math.max(0, Math.min(els.length - 1, i));
+        els.forEach((slide, index) => {
+          slide.classList.toggle("is-active", index === active);
+          slide.classList.toggle("is-before", index < active);
+          slide.setAttribute("aria-hidden", index === active ? "false" : "true");
+        });
+        counter.textContent = `${active + 1} / ${els.length}`;
+        progress.style.width = `${((active + 1) / els.length) * 100}%`;
+        try { localStorage.setItem(KEY, String(active)); } catch (_) {}
+      }
+      function onKey(e) {
+        const t = e.target;
+        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); setActive(active + 1); }
+        else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); setActive(active - 1); }
+        else if (e.key === "Home") { e.preventDefault(); setActive(0); }
+        else if (e.key === "End") { e.preventDefault(); setActive(els.length - 1); }
+      }
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      function beginTouch(x, y) {
+        touchStartX = x;
+        touchStartY = y;
+        touchStartTime = Date.now();
+      }
+      function finishTouch(x, y) {
+        const dx = x - touchStartX;
+        const dy = y - touchStartY;
+        const elapsed = Date.now() - touchStartTime;
+        if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+          setActive(active + (dx < 0 ? 1 : -1));
+          return;
+        }
+        if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && elapsed < 420) {
+          setActive(active + (x > window.innerWidth / 2 ? 1 : -1));
+        }
+      }
+      window.addEventListener("keydown", onKey, true);
+      window.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) beginTouch(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("touchend", (e) => {
+        if (e.changedTouches.length === 1) finishTouch(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }, { passive: true });
+      window.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        beginTouch(e.clientX, e.clientY);
+      }, true);
+      window.addEventListener("pointerup", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        finishTouch(e.clientX, e.clientY);
+      }, true);
+      document.body.setAttribute("tabindex", "-1");
+      document.body.style.outline = "none";
+      document.addEventListener("mousedown", () => { try { window.focus(); document.body.focus({ preventScroll: true }); } catch (_) {} });
+      try {
+        const saved = parseInt(localStorage.getItem(KEY) || "0", 10);
+        setActive(Number.isFinite(saved) ? saved : 0);
+      } catch (_) {
+        setActive(0);
+      }
+    })();
+  </script>
+</body>
+</html>
